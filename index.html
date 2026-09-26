@@ -132,6 +132,7 @@ input.in[type=date]{display:flex;align-items:center}
 input.in::-webkit-date-and-time-value{text-align:left}
 input.in:focus,textarea.in:focus,select.in:focus{border-color:var(--accent)}
 textarea.in{min-height:88px;resize:vertical;line-height:1.45}
+textarea.in.short{min-height:0;resize:none}
 .scale{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin-top:10px}
 .scale button{height:46px;border-radius:12px;background:var(--surface-2);font-weight:700;font-size:16px;transition:all .12s}
 .scale button.on{background:var(--accent);color:var(--bg);transform:scale(1.04)}
@@ -171,7 +172,8 @@ textarea.in{min-height:88px;resize:vertical;line-height:1.45}
 @keyframes fade{from{opacity:0}}
 @keyframes up{from{transform:translateY(30px);opacity:0}}
 .view{animation:fade .25s}
-.toast{position:fixed;left:50%;bottom:calc(96px + var(--safe-b));transform:translateX(-50%);background:var(--text);color:var(--bg);padding:10px 18px;border-radius:12px;font-size:14px;font-weight:600;z-index:60;animation:up .2s}
+.toast{position:fixed;left:50%;bottom:calc(96px + var(--safe-b));transform:translateX(-50%);width:max-content;max-width:calc(100vw - 32px);text-align:center;background:var(--text);color:var(--bg);padding:10px 18px;border-radius:12px;font-size:14px;font-weight:600;z-index:60;animation:toastin .2s}
+@keyframes toastin{from{transform:translate(-50%,30px);opacity:0}}
 .onb{min-height:100vh;min-height:100dvh;display:flex;flex-direction:column;justify-content:center;padding:calc(28px + var(--safe-t)) 16px calc(28px + var(--safe-b))}
 body.no-tabs{padding-bottom:0}
 .onb .card{margin:14px 0}
@@ -189,6 +191,9 @@ body.no-tabs{padding-bottom:0}
 .pin input{width:min(52px,18vw);height:58px;text-align:center;font-size:24px;font-weight:700;border-radius:14px;background:var(--surface-2);border:1.5px solid transparent;outline:none}
 .pin input:focus{border-color:var(--accent)}
 .hidden{display:none!important}
+#jc::placeholder{text-transform:none;letter-spacing:normal}
+.or{display:flex;align-items:center;gap:12px;margin:6px 0;color:var(--muted);font-size:13px;font-weight:600}
+.or::before,.or::after{content:'';flex:1;height:1px;background:var(--line)}
 @media (max-width:360px){.card{padding:15px}.grid2{gap:10px}.stat .v{font-size:26px}.seg button{font-size:12px}nav.tabs button{font-size:10px}}
 .tagline{font-family:var(--serif);font-size:clamp(17px,4.8vw,19px);font-style:italic;color:var(--muted);margin-top:6px}
 </style>
@@ -333,13 +338,15 @@ const Cloud = {
   },
 
   async refresh(){
+    let ok=true;
     try{ await this.queue; await this.load(); }
     catch(e){
-      console.error(e);
+      ok=false; console.error(e);
       if(this.status==='ready') toast('Sem conexão com a nuvem');
       else { this.status='error'; this.error=e.message||String(e); }
     }
     render();
+    return ok;
   },
 
   async load(){
@@ -650,11 +657,14 @@ function viewCouple(){
   return `<div class="wrap onb view">${LOGO_BIG}
     <h1>Vamos conectar vocês dois</h1>
     <p class="small muted" style="margin-top:6px">Conectado como ${esc(Cloud.user&&Cloud.user.email)}.</p>
-    <div class="card"><h3>O outro já criou o casal?</h3>
-      <p class="small muted" style="margin-top:4px">Peça o código de convite (fica em Mais → Configurações no celular dele(a)).</p>
-      <input class="in" id="jc" placeholder="Código de convite" autocapitalize="characters" autocomplete="off" autocorrect="off" spellcheck="false" style="margin-top:12px;text-transform:uppercase;letter-spacing:.15em">
-      <button class="btn btn-primary btn-block" style="margin-top:12px" onclick="cloudJoin()">Entrar no casal</button></div>
-    <div class="card"><h3>Ou comece um casal novo</h3>
+    <div class="card"><h3>Já tem o código do casal?</h3>
+      <p class="small muted" style="margin-top:4px">Se o(a) parceiro(a) já criou o casal, o código aparece no Início ou em Mais → Configurações no celular dele(a).</p>
+      <label class="f" for="jc">Código do casal</label>
+      <input class="in" id="jc" placeholder="Ex.: A1B2C3D4" maxlength="8" autocapitalize="characters" autocomplete="off" autocorrect="off" spellcheck="false" enterkeyhint="go" onkeydown="if(event.key==='Enter'){event.preventDefault();cloudJoin()}" style="text-transform:uppercase;letter-spacing:.15em">
+      <button class="btn btn-primary btn-block" style="margin-top:12px" onclick="cloudJoin()">Entrar com o código do casal</button></div>
+    <div class="or"><span>ou</span></div>
+    <div class="card"><h3>Ainda não tem código? Crie o casal</h3>
+      <p class="small muted" style="margin-top:4px">Quem cria recebe o código para enviar ao outro.</p>
       <div class="rule" style="margin-top:10px"><p class="small muted">O ELO não é uma arma. Ele não serve para provar quem está certo, cobrar o outro ou vencer uma discussão. Ele mostra onde o relacionamento precisa de atenção — para que vocês dois cuidem disso como equipe.</p></div>
       <label class="f">Seu nome</label><input class="in" id="n0" autocomplete="off" autocorrect="off" autocapitalize="words" spellcheck="false" enterkeyhint="next" onkeydown="if(event.key==='Enter'){event.preventDefault();$('#n1').focus()}" value="${L?esc(L.partners[0].name):''}">
       <label class="f">Nome do(a) parceiro(a)</label><input class="in" id="n1" autocomplete="off" autocorrect="off" autocapitalize="words" spellcheck="false" enterkeyhint="done" onkeydown="if(event.key==='Enter'){event.preventDefault();this.blur()}" value="${L?esc(L.partners[1].name):''}">
@@ -689,7 +699,7 @@ async function cloudJoin(){
 function inviteCard(){
   if(!CLOUD || Cloud.members.length>1) return '';
   return `<div class="card"><h3>Convide ${esc(nameOf(other(me)))}</h3>
-    <p class="small muted" style="margin-top:4px">Peça para criar uma conta no ELO e usar este código em “Entrar no casal”:</p>
+    <p class="small muted" style="margin-top:4px">Peça para criar uma conta no ELO e usar este código em “Entrar com o código do casal”:</p>
     <p style="font-size:26px;font-weight:700;letter-spacing:.2em;text-align:center;margin:12px 0">${esc(Cloud.couple.invite_code)}</p>
     <button class="btn btn-ghost btn-block" onclick="shareInvite()">Compartilhar convite</button></div>`;
 }
@@ -719,9 +729,14 @@ function viewPickUser(){
       </button>`).join('')}
     </div></div>`;
 }
+async function manualRefresh(btn){
+  btn.disabled=true; btn.textContent='Atualizando…';
+  const ok=await Cloud.refresh();
+  closeModal(); if(ok) toast('Dados atualizados ✓');
+}
 function switchUser(){
   if(CLOUD) return modal(`<h2>${esc(nameOf(me))}</h2><p class="small muted" style="margin:4px 0 14px">Conectado como ${esc(Cloud.user.email)}</p>
-    <div class="stack"><button class="btn btn-line btn-block" onclick="closeModal();Cloud.refresh()">Atualizar dados</button>
+    <div class="stack"><button class="btn btn-line btn-block" onclick="manualRefresh(this)">Atualizar dados</button>
     <button class="btn btn-line btn-block" onclick="closeModal();sb.auth.signOut()">Sair da conta</button></div>`);
   modal(`<h2>Trocar de pessoa</h2><p class="small muted" style="margin:4px 0 14px">Quem vai usar o ELO agora?</p>
     <div class="stack">${['p0','p1'].map(p=>`<button class="btn btn-line btn-block" style="justify-content:flex-start" onclick="closeModal();pickUser('${p}')"><span class="avatar av-${cls(p)}">${esc(initial(p))}</span>${esc(nameOf(p))}${p===me?' · atual':''}</button>`).join('')}</div>`);
@@ -1020,15 +1035,33 @@ function actionRow(a, full){
       <button class="btn btn-sm" style="color:var(--muted)" onclick="delAction('${a.id}')">Excluir</button></div>`:''}
   </div>`;
 }
+/* Exemplos da "Nova ação" para cada área: [o que percebemos, objetivo, ação concreta] */
+const ACTION_EX = {
+  '':          ['a semana passou sem tempo para nós dois', 'cuidar melhor da relação no dia a dia', 'escolher juntos uma pequena atitude no domingo à noite'],
+  comunicacao: ['conversamos pouco e terminamos reclamando', 'conversas mais leves e com escuta', '10 min por dia, sem celular, para contar como foi o dia'],
+  seguranca:   ['a voz sobe e um de nós se sente atacado', 'discordar sem gritos nem ofensas', 'usar a pausa combinada: 20 min longe e voltar a conversar'],
+  familia:     ['discordamos das regras na frente das crianças', 'falar a mesma língua com as crianças', 'combinar as regras a sós antes de falar com as crianças'],
+  parceria:    ['a carga da casa está pesando mais para um lado', 'dividir as tarefas de forma justa', 'listar as tarefas da semana e dividir no domingo'],
+  presenca:    ['o celular ocupa o tempo que seria nosso', 'mais momentos só nossos', 'jantar sem celular 3x na semana'],
+  afeto:       ['o carinho só aparece quando há expectativa sexual', 'mais carinho no dia a dia, sem pressão', 'um abraço demorado na chegada e na saída todos os dias'],
+  confianca:   ['feridas antigas voltam em toda discussão', 'reconstruir a confiança com transparência', 'avisar sobre mudanças de planos antes de acontecerem'],
+  reparacao:   ['depois de brigar ficamos dias sem falar', 'voltar a conversar mais rápido', 'quem pediu a pausa puxa a conversa no mesmo dia'],
+  proposito:   ['cada um está correndo atrás de um objetivo diferente', 'ter planos em comum para o futuro', 'separar 1 hora no mês para sonhar e planejar juntos']
+};
+function actionExamples(dimId){
+  const [p,g,a]=ACTION_EX[dimId]||ACTION_EX[''];
+  $('#a-prob').placeholder='Ex.: '+p; $('#a-goal').placeholder='Ex.: '+g; $('#a-act').placeholder='Ex.: '+a;
+}
 function newAction(dimId){
   modal(`<h2>Nova ação</h2>
-    <label class="f">Área</label><select class="in" id="a-dim"><option value="">Geral</option>${DIMS.map(d=>`<option value="${d.id}" ${d.id===dimId?'selected':''}>${d.name}</option>`).join('')}</select>
-    <label class="f">O que percebemos</label><input class="in" id="a-prob" placeholder="Ex.: conversamos pouco e terminamos reclamando">
-    <label class="f">Objetivo</label><input class="in" id="a-goal" placeholder="Ex.: conversas mais leves">
-    <label class="f">Ação concreta</label><input class="in" id="a-act" placeholder="Ex.: 20 min sem celular, 3x na semana">
+    <label class="f">Área</label><select class="in" id="a-dim" onchange="actionExamples(this.value)"><option value="">Geral</option>${DIMS.map(d=>`<option value="${d.id}" ${d.id===dimId?'selected':''}>${d.name}</option>`).join('')}</select>
+    <label class="f">O que percebemos</label><textarea class="in short" id="a-prob" rows="2"></textarea>
+    <label class="f">Objetivo</label><textarea class="in short" id="a-goal" rows="2"></textarea>
+    <label class="f">Ação concreta</label><textarea class="in short" id="a-act" rows="2"></textarea>
     <label class="f">Responsável</label><select class="in" id="a-own"><option value="both">Ambos</option><option value="p0">${esc(nameOf('p0'))}</option><option value="p1">${esc(nameOf('p1'))}</option></select>
     <label class="f">Prazo</label><input class="in" type="date" id="a-due" value="${localISO(new Date(Date.now()+7*864e5))}">
     <button class="btn btn-primary btn-block" style="margin-top:18px" onclick="saveAction()">Salvar ação</button>`);
+  actionExamples(dimId||'');
 }
 function saveAction(){
   const act=$('#a-act').value.trim(); if(!act) return toast('Descreva a ação');
