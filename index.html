@@ -45,12 +45,14 @@
   }
 }
 *{box-sizing:border-box;margin:0;padding:0}
-html,body{background:var(--bg)}
+html,body{background:var(--bg);overscroll-behavior-y:none}
 body{font-family:var(--sans);color:var(--text);font-size:15px;line-height:1.5;-webkit-font-smoothing:antialiased;-webkit-tap-highlight-color:transparent;padding-bottom:calc(84px + var(--safe-b));min-height:100vh}
 button,input,textarea,select{font:inherit;color:inherit}
 button{cursor:pointer;border:none;background:none}
 .wrap{max-width:560px;margin:0 auto;padding:0 16px}
-header.top{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);padding-top:var(--safe-t)}
+header.top{position:sticky;top:0;z-index:20;background:var(--bg);border-bottom:1px solid color-mix(in srgb,var(--line) 60%,transparent);padding-top:var(--safe-t)}
+/* cobre o espaço acima do cabeçalho quando a barra do Safari encolhe ou a página é puxada */
+header.top::before{content:'';position:absolute;left:0;right:0;bottom:100%;height:120px;background:var(--bg)}
 header.top .wrap{display:flex;align-items:center;justify-content:space-between;height:60px}
 .brand{display:flex;align-items:center;gap:10px}
 .brand .logo{height:24px;width:auto;flex:none}
@@ -116,7 +118,7 @@ h3{font-size:14px;font-weight:600}
 .signal.info{background:var(--a-soft);color:var(--a)}
 .quote{border-left:3px solid var(--line);padding:4px 0 4px 12px;margin-top:10px}
 .quote .by{font-size:12px;font-weight:600;margin-bottom:2px}
-nav.tabs{position:fixed;left:0;right:0;bottom:0;z-index:30;background:color-mix(in srgb,var(--surface) 94%,transparent);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-top:1px solid var(--line);padding-bottom:var(--safe-b)}
+nav.tabs{position:fixed;left:0;right:0;bottom:0;z-index:30;background:var(--surface);border-top:1px solid var(--line);padding-bottom:var(--safe-b)}
 nav.tabs .wrap{display:flex;justify-content:space-around;height:64px;align-items:center;padding:0 4px}
 nav.tabs button{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;font-size:11px;font-weight:600;color:var(--faint);padding:6px 0}
 nav.tabs button svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
@@ -124,8 +126,8 @@ nav.tabs button.on{color:var(--accent)}
 label.f{display:block;font-size:13px;font-weight:600;margin:14px 0 6px}
 /* 16px evita o zoom automático do Safari ao tocar no campo */
 input.in,textarea.in,select.in{display:block;width:100%;min-width:0;-webkit-appearance:none;appearance:none;background:var(--surface-2);border:1px solid var(--line);border-radius:12px;padding:10px 14px;font-size:16px;line-height:1.4;outline:none;transition:border .15s}
-input.in{height:46px}
-select.in{height:46px;padding-right:34px;background-image:linear-gradient(45deg,transparent 50%,var(--muted) 50%),linear-gradient(135deg,var(--muted) 50%,transparent 50%);background-position:calc(100% - 18px) 50%,calc(100% - 13px) 50%;background-size:5px 5px;background-repeat:no-repeat}
+input.in{height:44px}
+select.in{height:44px;padding-right:34px;background-image:linear-gradient(45deg,transparent 50%,var(--muted) 50%),linear-gradient(135deg,var(--muted) 50%,transparent 50%);background-position:calc(100% - 18px) 50%,calc(100% - 13px) 50%;background-size:5px 5px;background-repeat:no-repeat}
 input.in[type=date]{display:flex;align-items:center}
 input.in::-webkit-date-and-time-value{text-align:left}
 input.in:focus,textarea.in:focus,select.in:focus{border-color:var(--accent)}
@@ -176,8 +178,8 @@ body.no-tabs{padding-bottom:0}
 .onb .logo-big{height:56px;width:auto;align-self:flex-start;margin-bottom:20px}
 .rule{background:var(--surface);border-radius:var(--radius);padding:20px;margin:22px 0;border:1px solid var(--line)}
 .rule h3{font-family:var(--serif);font-size:18px;margin-bottom:6px}
-.check{display:flex;gap:12px;align-items:flex-start;margin:14px 0;font-size:14px}
-.check input{width:20px;height:20px;accent-color:var(--accent);margin-top:2px;flex:none}
+.check{display:flex;gap:12px;align-items:flex-start;margin:20px 0 16px;padding:4px 0;font-size:14px;cursor:pointer;-webkit-user-select:none;user-select:none}
+.check input{width:22px;height:22px;accent-color:var(--accent);margin-top:2px;flex:none}
 .steps li{margin:10px 0 0 18px;font-size:14px}
 .steps li b{font-weight:600}
 .resource{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px 0;border-top:1px solid color-mix(in srgb,currentColor 20%,transparent)}
@@ -309,7 +311,7 @@ const Store = {
    Regras de privacidade ficam no banco (supabase/schema.sql):
    - "Meu espaço" e respostas de segurança: só o próprio usuário vê;
    - check-in do outro: só aparece depois que eu respondi a mesma semana. */
-const CFG = window.ELO_CONFIG || {};
+const CFG = Object.fromEntries(Object.entries(window.ELO_CONFIG || {}).map(([k,v])=>[k, String(v||'').trim()]));   // tolera espaços/quebras coladas por engano
 const CLOUD = !!(CFG.supabaseUrl && CFG.supabaseAnonKey);
 const sb = CLOUD && window.supabase ? window.supabase.createClient(CFG.supabaseUrl, CFG.supabaseAnonKey) : null;
 const Cloud = {
@@ -563,9 +565,9 @@ function viewOnboarding(){
       </ol>
     </div>
     <label class="f">Nome de quem está configurando</label>
-    <input class="in" id="n0" placeholder="Seu nome" autocomplete="given-name">
+    <input class="in" id="n0" placeholder="Seu nome" autocomplete="off" autocorrect="off" autocapitalize="words" spellcheck="false" enterkeyhint="next" onkeydown="if(event.key==='Enter'){event.preventDefault();$('#n1').focus()}">
     <label class="f">Nome do(a) parceiro(a)</label>
-    <input class="in" id="n1" placeholder="Nome do(a) parceiro(a)">
+    <input class="in" id="n1" placeholder="Nome do(a) parceiro(a)" autocomplete="off" autocorrect="off" autocapitalize="words" spellcheck="false" enterkeyhint="done" onkeydown="if(event.key==='Enter'){event.preventDefault();this.blur()}">
     <label class="check"><input type="checkbox" id="agree"><span>Concordamos em usar o ELO com honestidade, sem usar as respostas do outro como munição.</span></label>
     <button class="btn btn-primary btn-block" onclick="finishOnboarding()">Começar</button>
     <p class="tiny muted" style="margin-top:14px;text-align:center">Nesta versão os dados ficam só neste aparelho. Nada é enviado para servidores.</p>
@@ -600,7 +602,7 @@ function viewLogin(){
     <p class="tagline">Dois caminhos, um só elo.</p>
     <h1 style="margin-top:8px">Entre na sua conta</h1>
     <p class="small muted" style="margin-top:6px">Cada um usa a própria conta, no próprio celular. Seus check-ins, seu espaço privado e suas respostas de segurança ficam protegidos.</p>
-    <label class="f">E-mail</label><input class="in" id="li-e" type="email" autocomplete="email" inputmode="email">
+    <label class="f">E-mail</label><input class="in" id="li-e" type="email" autocomplete="email" inputmode="email" autocapitalize="none" autocorrect="off" spellcheck="false" enterkeyhint="next">
     <label class="f">Senha</label><input class="in" id="li-p" type="password" autocomplete="current-password" placeholder="Mínimo 6 caracteres">
     <div class="stack" style="margin-top:16px">
       <button class="btn btn-primary btn-block" onclick="cloudLogin(false)">Entrar</button>
@@ -650,12 +652,12 @@ function viewCouple(){
     <p class="small muted" style="margin-top:6px">Conectado como ${esc(Cloud.user&&Cloud.user.email)}.</p>
     <div class="card"><h3>O outro já criou o casal?</h3>
       <p class="small muted" style="margin-top:4px">Peça o código de convite (fica em Mais → Configurações no celular dele(a)).</p>
-      <input class="in" id="jc" placeholder="Código de convite" autocapitalize="characters" style="margin-top:12px;text-transform:uppercase;letter-spacing:.15em">
+      <input class="in" id="jc" placeholder="Código de convite" autocapitalize="characters" autocomplete="off" autocorrect="off" spellcheck="false" style="margin-top:12px;text-transform:uppercase;letter-spacing:.15em">
       <button class="btn btn-primary btn-block" style="margin-top:12px" onclick="cloudJoin()">Entrar no casal</button></div>
     <div class="card"><h3>Ou comece um casal novo</h3>
       <div class="rule" style="margin-top:10px"><p class="small muted">O ELO não é uma arma. Ele não serve para provar quem está certo, cobrar o outro ou vencer uma discussão. Ele mostra onde o relacionamento precisa de atenção — para que vocês dois cuidem disso como equipe.</p></div>
-      <label class="f">Seu nome</label><input class="in" id="n0" autocomplete="given-name" value="${L?esc(L.partners[0].name):''}">
-      <label class="f">Nome do(a) parceiro(a)</label><input class="in" id="n1" value="${L?esc(L.partners[1].name):''}">
+      <label class="f">Seu nome</label><input class="in" id="n0" autocomplete="off" autocorrect="off" autocapitalize="words" spellcheck="false" enterkeyhint="next" onkeydown="if(event.key==='Enter'){event.preventDefault();$('#n1').focus()}" value="${L?esc(L.partners[0].name):''}">
+      <label class="f">Nome do(a) parceiro(a)</label><input class="in" id="n1" autocomplete="off" autocorrect="off" autocapitalize="words" spellcheck="false" enterkeyhint="done" onkeydown="if(event.key==='Enter'){event.preventDefault();this.blur()}" value="${L?esc(L.partners[1].name):''}">
       <label class="check"><input type="checkbox" id="agree"><span>Concordamos em usar o ELO com honestidade, sem usar as respostas do outro como munição.</span></label>
       ${L?`<label class="check"><input type="checkbox" id="mig" checked><span>Levar para a nuvem o que já foi registrado neste aparelho (check-ins de ${esc(L.partners[0].name)}, ações, reconhecimentos, conflitos e o espaço privado de ${esc(L.partners[0].name)}).</span></label>`:''}
       <button class="btn btn-ghost btn-block" onclick="cloudCreate()">Criar casal</button></div>
@@ -1144,8 +1146,8 @@ function viewConfig(){
   const i=me==='p0'?0:1;
   if(CLOUD) return `<button class="back" onclick="go('mais')">‹ Mais</button><section class="hero"><h1>Configurações</h1></section>
   <div class="card"><h3>Nomes</h3>
-    <label class="f">Parceiro 1</label><input class="in" id="cfg0" value="${esc(S.partners[0].name)}">
-    <label class="f">Parceiro 2</label><input class="in" id="cfg1" value="${esc(S.partners[1].name)}">
+    <label class="f">Parceiro 1</label><input class="in" id="cfg0" autocomplete="off" autocorrect="off" autocapitalize="words" spellcheck="false" value="${esc(S.partners[0].name)}">
+    <label class="f">Parceiro 2</label><input class="in" id="cfg1" autocomplete="off" autocorrect="off" autocapitalize="words" spellcheck="false" value="${esc(S.partners[1].name)}">
     <button class="btn btn-ghost btn-block" style="margin-top:12px" onclick="saveNames()">Salvar nomes</button></div>
   ${inviteCard()}
   <div class="card"><h3>Conta</h3><p class="small muted" style="margin-top:4px">Conectado como ${esc(Cloud.user.email)}. Os dados sincronizam automaticamente entre os dois celulares.</p>
@@ -1158,8 +1160,8 @@ function viewConfig(){
     </div></div>`;
   return `<button class="back" onclick="go('mais')">‹ Mais</button><section class="hero"><h1>Configurações</h1></section>
   <div class="card"><h3>Nomes</h3>
-    <label class="f">Parceiro 1</label><input class="in" id="cfg0" value="${esc(S.partners[0].name)}">
-    <label class="f">Parceiro 2</label><input class="in" id="cfg1" value="${esc(S.partners[1].name)}">
+    <label class="f">Parceiro 1</label><input class="in" id="cfg0" autocomplete="off" autocorrect="off" autocapitalize="words" spellcheck="false" value="${esc(S.partners[0].name)}">
+    <label class="f">Parceiro 2</label><input class="in" id="cfg1" autocomplete="off" autocorrect="off" autocapitalize="words" spellcheck="false" value="${esc(S.partners[1].name)}">
     <button class="btn btn-ghost btn-block" style="margin-top:12px" onclick="saveNames()">Salvar nomes</button></div>
   <div class="card"><h3>PIN de ${esc(nameOf(me))}</h3><p class="small muted" style="margin-top:4px">Protege seu espaço privado quando os dois usam o mesmo aparelho.</p>
     <div class="row" style="margin-top:12px">${S.partners[i].pin?`<button class="btn btn-ghost btn-sm" onclick="setPin()">Trocar PIN</button><button class="btn btn-sm" style="color:var(--muted)" onclick="clearPin()">Remover</button>`:`<button class="btn btn-ghost btn-sm" onclick="setPin()">Definir PIN</button>`}</div></div>
