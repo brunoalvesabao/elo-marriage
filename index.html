@@ -53,13 +53,15 @@ button{cursor:pointer;border:none;background:none}
 header.top{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);padding-top:var(--safe-t)}
 header.top .wrap{display:flex;align-items:center;justify-content:space-between;height:60px}
 .brand{display:flex;align-items:center;gap:10px}
-.brand .logo{width:42px;height:21px}
+.brand .logo{height:24px;width:auto;flex:none}
 .brand b{font-family:var(--serif);font-size:22px;font-weight:600;letter-spacing:.02em}
-.who{display:flex;align-items:center;gap:8px;padding:6px 12px 6px 6px;border-radius:999px;background:var(--surface);box-shadow:var(--shadow);font-size:13px;font-weight:600}
+.who{display:flex;align-items:center;gap:8px;max-width:55%;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding:6px 12px 6px 6px;border-radius:999px;background:var(--surface);box-shadow:var(--shadow);font-size:13px;font-weight:600}
 .avatar{width:26px;height:26px;border-radius:50%;display:grid;place-items:center;color:#fff;font-size:12px;font-weight:700}
+.who .nm{overflow:hidden;text-overflow:ellipsis}
+.avatar{flex:none}
 .av-a{background:var(--a)} .av-b{background:var(--b)}
 @media (prefers-color-scheme:dark){.avatar{color:#141816}}
-h1{font-family:var(--serif);font-weight:600;font-size:28px;line-height:1.15;letter-spacing:-.01em}
+h1{font-family:var(--serif);font-weight:600;font-size:clamp(23px,6.6vw,28px);line-height:1.15;letter-spacing:-.01em}
 h2{font-family:var(--serif);font-weight:600;font-size:20px;line-height:1.25}
 h3{font-size:14px;font-weight:600}
 .eyebrow{font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
@@ -85,8 +87,10 @@ h3{font-size:14px;font-weight:600}
 .btn[disabled]{opacity:.4;pointer-events:none}
 .row{display:flex;gap:10px;align-items:center}
 .row.between{justify-content:space-between}
+.row>*{min-width:0}
 .stack>*+*{margin-top:10px}
-.pill{display:inline-flex;align-items:center;gap:6px;height:26px;padding:0 10px;border-radius:999px;font-size:12px;font-weight:600;background:var(--surface-2);color:var(--muted)}
+.pill{display:inline-flex;align-items:center;gap:6px;height:26px;padding:0 10px;white-space:nowrap;flex:none;border-radius:999px;font-size:12px;font-weight:600;background:var(--surface-2);color:var(--muted)}
+.pill.wrap{white-space:normal;height:auto;min-height:26px;padding:3px 10px;flex:0 1 auto}
 .pill.good{background:var(--good-soft);color:var(--good)}
 .pill.warn{background:var(--warn-soft);color:var(--warn)}
 .pill.alert{background:var(--alert-soft);color:var(--alert)}
@@ -118,9 +122,14 @@ nav.tabs button{flex:1;display:flex;flex-direction:column;align-items:center;gap
 nav.tabs button svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
 nav.tabs button.on{color:var(--accent)}
 label.f{display:block;font-size:13px;font-weight:600;margin:14px 0 6px}
-input.in,textarea.in,select.in{width:100%;background:var(--surface-2);border:1px solid transparent;border-radius:12px;padding:12px 14px;font-size:16px;outline:none;transition:border .15s}
+/* 16px evita o zoom automático do Safari ao tocar no campo */
+input.in,textarea.in,select.in{display:block;width:100%;min-width:0;-webkit-appearance:none;appearance:none;background:var(--surface-2);border:1px solid var(--line);border-radius:12px;padding:10px 14px;font-size:16px;line-height:1.4;outline:none;transition:border .15s}
+input.in{height:46px}
+select.in{height:46px;padding-right:34px;background-image:linear-gradient(45deg,transparent 50%,var(--muted) 50%),linear-gradient(135deg,var(--muted) 50%,transparent 50%);background-position:calc(100% - 18px) 50%,calc(100% - 13px) 50%;background-size:5px 5px;background-repeat:no-repeat}
+input.in[type=date]{display:flex;align-items:center}
+input.in::-webkit-date-and-time-value{text-align:left}
 input.in:focus,textarea.in:focus,select.in:focus{border-color:var(--accent)}
-textarea.in{min-height:92px;resize:vertical;line-height:1.45}
+textarea.in{min-height:88px;resize:vertical;line-height:1.45}
 .scale{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin-top:10px}
 .scale button{height:46px;border-radius:12px;background:var(--surface-2);font-weight:700;font-size:16px;transition:all .12s}
 .scale button.on{background:var(--accent);color:var(--bg);transform:scale(1.04)}
@@ -155,14 +164,16 @@ textarea.in{min-height:92px;resize:vertical;line-height:1.45}
 .empty{text-align:center;padding:24px 12px;color:var(--muted);font-size:14px}
 .chart-box{position:relative;width:100%}
 .modal-bg{position:fixed;inset:0;background:rgba(10,12,10,.45);z-index:50;display:flex;align-items:flex-end;justify-content:center;animation:fade .2s}
-.modal{background:var(--surface);width:100%;max-width:560px;border-radius:22px 22px 0 0;padding:22px 18px calc(22px + var(--safe-b));max-height:90vh;overflow:auto;animation:up .25s ease}
+.modal{background:var(--surface);width:100%;max-width:560px;border-radius:22px 22px 0 0;padding:22px 18px calc(22px + var(--safe-b));max-height:90vh;max-height:90dvh;overflow:auto;overscroll-behavior:contain;animation:up .25s ease}
 @media (min-width:640px){.modal-bg{align-items:center}.modal{border-radius:22px}}
 @keyframes fade{from{opacity:0}}
 @keyframes up{from{transform:translateY(30px);opacity:0}}
 .view{animation:fade .25s}
 .toast{position:fixed;left:50%;bottom:calc(96px + var(--safe-b));transform:translateX(-50%);background:var(--text);color:var(--bg);padding:10px 18px;border-radius:12px;font-size:14px;font-weight:600;z-index:60;animation:up .2s}
-.onb{min-height:100vh;display:flex;flex-direction:column;justify-content:center;padding:32px 16px}
-.onb .logo-big{width:104px;height:52px;margin-bottom:22px}
+.onb{min-height:100vh;min-height:100dvh;display:flex;flex-direction:column;justify-content:center;padding:calc(28px + var(--safe-t)) 16px calc(28px + var(--safe-b))}
+body.no-tabs{padding-bottom:0}
+.onb .card{margin:14px 0}
+.onb .logo-big{height:56px;width:auto;align-self:flex-start;margin-bottom:20px}
 .rule{background:var(--surface);border-radius:var(--radius);padding:20px;margin:22px 0;border:1px solid var(--line)}
 .rule h3{font-family:var(--serif);font-size:18px;margin-bottom:6px}
 .check{display:flex;gap:12px;align-items:flex-start;margin:14px 0;font-size:14px}
@@ -171,12 +182,13 @@ textarea.in{min-height:92px;resize:vertical;line-height:1.45}
 .steps li b{font-weight:600}
 .resource{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px 0;border-top:1px solid color-mix(in srgb,currentColor 20%,transparent)}
 .resource:first-of-type{border-top:none}
-.resource a{font-weight:700;color:inherit;text-decoration:none;font-size:18px;white-space:nowrap}
+.resource a{font-weight:700;color:inherit;text-decoration:none;font-size:18px;white-space:nowrap;flex:none}
 .pin{display:flex;gap:10px;justify-content:center;margin:16px 0}
-.pin input{width:52px;height:58px;text-align:center;font-size:24px;font-weight:700;border-radius:14px;background:var(--surface-2);border:1.5px solid transparent;outline:none}
+.pin input{width:min(52px,18vw);height:58px;text-align:center;font-size:24px;font-weight:700;border-radius:14px;background:var(--surface-2);border:1.5px solid transparent;outline:none}
 .pin input:focus{border-color:var(--accent)}
 .hidden{display:none!important}
-.tagline{font-family:'Fraunces',Georgia,serif;font-size:19px;font-style:italic;color:var(--muted);margin-top:6px}
+@media (max-width:360px){.card{padding:15px}.grid2{gap:10px}.stat .v{font-size:26px}.seg button{font-size:12px}nav.tabs button{font-size:10px}}
+.tagline{font-family:var(--serif);font-size:clamp(17px,4.8vw,19px);font-style:italic;color:var(--muted);margin-top:6px}
 </style>
 </head>
 <body>
@@ -242,10 +254,13 @@ const SAFETY_Q = [
 /* ---------- Utilidades ---------- */
 const $ = s => document.querySelector(s);
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const validId = x => typeof x==='string' && /^[A-Za-z0-9_-]{1,64}$/.test(x);
+const validWeek = x => typeof x==='string' && /^\d{4}-W\d{2}$/.test(x);
 const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2,8);
 const avg = a => a.length ? a.reduce((x,y)=>x+y,0)/a.length : null;
 const fmt1 = n => n == null ? '—' : n.toFixed(1).replace('.',',');
-const todayISO = () => new Date().toISOString().slice(0,10);
+const localISO = d => `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+const todayISO = () => localISO(new Date());   // data local (toISOString usaria UTC e viraria o dia às 21h no Brasil)
 const fmtDate = iso => { if(!iso) return ''; const d = new Date(iso.length===10 ? iso+'T12:00:00' : iso); return d.toLocaleDateString('pt-BR',{day:'2-digit',month:'short'}); };
 const daysBetween = (a,b) => Math.round((new Date(b) - new Date(a)) / 86400000);
 
@@ -300,7 +315,7 @@ const sb = CLOUD && window.supabase ? window.supabase.createClient(CFG.supabaseU
 const Cloud = {
   status: CLOUD ? 'loading' : 'off',   // loading | auth | couple | ready | error | off
   error: '', user: null, couple: null, members: [],
-  snap: new Map(), queue: Promise.resolve(),
+  snap: new Map(), queue: Promise.resolve(), edits: 0,
 
   async init(){
     if(!sb){ this.status='error'; this.error='Não foi possível carregar o Supabase. Verifique a internet.'; render(); return; }
@@ -326,7 +341,8 @@ const Cloud = {
   },
 
   async load(){
-    const uid = this.user.id;
+    await this.queue;
+    const edits = this.edits, uid = this.user.id;
     const m = await sb.from('members').select('couple_id,user_id,slot');
     if(m.error) throw m.error;
     const mine = (m.data||[]).find(x=>x.user_id===uid);
@@ -338,18 +354,22 @@ const Cloud = {
       sb.rpc('week_status')
     ]);
     for(const r of [c,it,pv,ws]) if(r.error) throw r.error;
+    // algo foi salvo enquanto buscávamos: espera o envio e busca de novo, senão a alteração se perderia
+    if(edits!==this.edits) return this.load();
     this.couple=c.data; this.members=m.data; me=mine.slot;
     const T=Store.blank(); T.onboarded=true;
     T.partners=[{name:c.data.p0_name,pin:null},{name:c.data.p1_name,pin:null}];
     const round = wk => T.rounds[wk] || (T.rounds[wk]={id:wk,week:wk,entries:{}});
     // quem já respondeu, mesmo quando as respostas ainda estão ocultas
-    (ws.data||[]).forEach(w=>{ round(w.week).entries[w.slot]={hidden:true,at:w.at}; });
+    (ws.data||[]).filter(w=>validWeek(w.week)&&(w.slot==='p0'||w.slot==='p1')).forEach(w=>{ round(w.week).entries[w.slot]={hidden:true,at:w.at}; });
+    // ids entram em atributos onclick: descarta qualquer registro malformado
     (it.data||[]).forEach(x=>{
-      if(x.kind==='entry'){ const [wk,slot]=x.id.split(':'); round(wk).entries[slot]=x.data; }
-      else T[x.kind+'s'].push(x.data);
+      if(!x.data||typeof x.data!=='object') return;
+      if(x.kind==='entry'){ const [wk,slot]=x.id.split(':'); if(validWeek(wk)&&(slot==='p0'||slot==='p1')) round(wk).entries[slot]=x.data; }
+      else if(validId(x.id)&&x.data.id===x.id) T[x.kind+'s'].push(x.data);
     });
     (pv.data||[]).forEach(x=>{
-      if(x.kind==='note') T.private[me].push(x.data);
+      if(x.kind==='note'){ if(validId(x.id)&&x.data&&x.data.id===x.id) T.private[me].push(x.data); }
       else if(x.kind==='safety'){ const e=T.rounds[x.id]&&T.rounds[x.id].entries[me]; if(e&&!e.hidden) e.safety=x.data; }
     });
     const by = k => (a,b)=>String(a[k]||'').localeCompare(String(b[k]||''));
@@ -377,6 +397,7 @@ const Cloud = {
 
   sync(){
     if(this.status!=='ready') return this.queue;
+    this.edits++;
     this.queue=this.queue.then(()=>this._sync()).catch(e=>{ console.error(e); toast('Não foi possível salvar na nuvem. Verifique a conexão.'); });
     return this.queue;
   },
@@ -480,12 +501,17 @@ const ICONS = {
 function eloMark(cls, id){
   const a=178, sy=1.42, gap=21, sw=cls==='logo'?30:20;
   const pt=t=>{ const s=Math.sin(t), c=Math.cos(t), k=1+s*s; return [a*c/k, sy*a*s*c/k]; };
+  const box=[Infinity,Infinity,-Infinity,-Infinity];
   const path=(o,t0,t1,n)=>'M'+Array.from({length:n+1},(_,i)=>{ const t=t0+(t1-t0)*i/n, [x,y]=pt(t), [x2,y2]=pt(t+1e-4), L=Math.hypot(x2-x,y2-y);
-    return (256+x-(y2-y)/L*o).toFixed(1)+','+(256+y+(x2-x)/L*o).toFixed(1); }).join('L');
+    const X=256+x-(y2-y)/L*o, Y=256+y+(x2-x)/L*o;
+    box[0]=Math.min(box[0],X); box[1]=Math.min(box[1],Y); box[2]=Math.max(box[2],X); box[3]=Math.max(box[3],Y);
+    return X.toFixed(1)+','+Y.toFixed(1); }).join('L');
   const T=3*Math.PI/2, seg=(o,d)=>path(o,T-d,T+d,24), full=o=>path(o,0,2*Math.PI,160)+'Z';
   const st=(d,c,w,cap)=>`<path d="${d}" fill="none" stroke="${c}" stroke-width="${w}" stroke-linecap="${cap||'round'}" stroke-linejoin="round"/>`;
-  return `<svg class="${cls}" viewBox="28 140 456 232" aria-hidden="true"><defs><mask id="elo-${id}" maskUnits="userSpaceOnUse" x="0" y="0" width="512" height="512"><rect width="512" height="512" fill="#fff"/>${st(seg(gap,.34),'#000',sw+24,'butt')+st(seg(-gap,.34),'#000',sw+24,'butt')}</mask></defs>
-    <g mask="url(#elo-${id})">${st(full(gap),'var(--a)',sw)+st(full(-gap),'var(--b)',sw)}</g>${st(seg(gap,.42),'var(--a)',sw,'butt')+st(seg(-gap,.42),'var(--b)',sw,'butt')}</svg>`;
+  const strands=st(full(gap),'var(--a)',sw)+st(full(-gap),'var(--b)',sw);
+  const m=sw/2+2, vb=[box[0]-m, box[1]-m, box[2]-box[0]+2*m, box[3]-box[1]+2*m].map(v=>v.toFixed(1)).join(' ');
+  return `<svg class="${cls}" viewBox="${vb}" aria-hidden="true"><defs><mask id="elo-${id}" maskUnits="userSpaceOnUse" x="0" y="0" width="512" height="512"><rect width="512" height="512" fill="#fff"/>${st(seg(gap,.34),'#000',sw+24,'butt')+st(seg(-gap,.34),'#000',sw+24,'butt')}</mask></defs>
+    <g mask="url(#elo-${id})">${strands}</g>${st(seg(gap,.42),'var(--a)',sw,'butt')+st(seg(-gap,.42),'var(--b)',sw,'butt')}</svg>`;
 }
 const LOGO = eloMark('logo','h');
 
@@ -494,7 +520,7 @@ function shell(content){
   return `
   <header class="top"><div class="wrap">
     <div class="brand">${LOGO}<b>ELO</b></div>
-    <button class="who" onclick="switchUser()"><span class="avatar av-${cls(me)}">${esc(initial(me))}</span>${esc(nameOf(me))}</button>
+    <button class="who" onclick="switchUser()"><span class="avatar av-${cls(me)}">${esc(initial(me))}</span><span class="nm">${esc(nameOf(me))}</span></button>
   </div></header>
   <main class="wrap view">${content}</main>
   <nav class="tabs"><div class="wrap">
@@ -507,6 +533,7 @@ function go(v, s=null){ view=v; sub=s; render(); window.scrollTo(0,0); }
 function render(){
   destroyCharts();
   const app = $('#app');
+  document.body.classList.toggle('no-tabs', !(S.onboarded && me && (!CLOUD || Cloud.status==='ready')));
   if(CLOUD && Cloud.status!=='ready'){ app.innerHTML = viewCloud(); return; }
   if(!S.onboarded){ app.innerHTML = viewOnboarding(); return; }
   if(!me){ app.innerHTML = viewPickUser(); return; }
@@ -884,7 +911,7 @@ function checkinStep(){
       <ul class="hints">${d.hints.map(h=>`<li>${h}</li>`).join('')}</ul>
       <div class="scale">${[1,2,3,4,5].map(n=>`<button class="${draft.scores[d.id]===n?'on':''}" onclick="setScore('${d.id}',${n})">${n}</button>`).join('')}</div>
       <div class="scale-legend"><span>Muito difícil</span><span>Muito bem</span></div>
-      <textarea class="in" style="min-height:52px;margin-top:10px;font-size:15px" placeholder="Comentário (opcional, o outro verá)" oninput="draft.notes['${d.id}']=this.value">${esc(draft.notes[d.id]||'')}</textarea>
+      <textarea class="in" style="min-height:52px;margin-top:10px" placeholder="Comentário (opcional, o outro verá)" oninput="draft.notes['${d.id}']=this.value">${esc(draft.notes[d.id]||'')}</textarea>
     </div>`).join('')}`;
   }
   if(st===2){
@@ -902,7 +929,7 @@ function checkinStep(){
     <p class="tiny muted" style="margin-top:6px">O reconhecimento também vai para o mural de reconhecimentos.</p>`;
   }
   const canNext = st===0 ? !!draft.mood : st===1 ? DIMS.every(d=>draft.scores[d.id]) : st===2 ? SAFETY_Q.every(q=>typeof draft.safety[q.id]==='boolean') : true;
-  return `<section class="hero" style="padding-bottom:0"><div class="row between"><span class="eyebrow">Passo ${st+1} de ${STEPS.length} · ${STEPS[st]}</span>${st>0?`<button class="tiny muted" onclick="draft.step--;render();scrollTo(0,0)">‹ Voltar</button>`:''}</div>
+  return `<section class="hero" style="padding-bottom:0"><div class="row between"><span class="eyebrow">Passo ${st+1} de ${STEPS.length} · ${STEPS[st]}</span>${st>0?`<button class="tiny muted" style="white-space:nowrap;flex:none" onclick="draft.step--;render();scrollTo(0,0)">‹ Voltar</button>`:''}</div>
     <div class="progress"><i style="width:${(st+1)/STEPS.length*100}%"></i></div></section>
     ${body}
     <div style="margin:22px 0">${st<STEPS.length-1
@@ -936,9 +963,9 @@ function viewEvolucao(){
   const rs=completeRounds();
   let html=`<section class="hero"><div class="eyebrow">Histórico</div><h1>Estamos melhorando?</h1><p>Tendências valem mais do que uma semana isolada.</p></section>`;
   if(rs.length<1) return html+`<div class="card flat empty">O histórico começa a aparecer depois da primeira semana com os dois check-ins completos.</div>`;
-  html+=`<div class="seg" style="margin-top:8px">${[[4,'4 semanas'],[13,'3 meses'],[26,'6 meses'],[999,'Tudo']].map(([n,t])=>`<button class="${histPeriod===n?'on':''}" onclick="histPeriod=${n};render()">${t}</button>`).join('')}</div>
+  html+=`<div class="seg" style="margin-top:8px">${[[4,'1 mês'],[13,'3 meses'],[26,'6 meses'],[999,'Tudo']].map(([n,t])=>`<button class="${histPeriod===n?'on':''}" onclick="histPeriod=${n};render()">${t}</button>`).join('')}</div>
   <div class="card"><div class="card-h"><h3>Evolução</h3>
-    <select class="in" style="width:auto;padding:6px 10px;font-size:13px" onchange="histDim=this.value;render()">
+    <select class="in" style="width:auto;max-width:55%;height:38px;padding:6px 32px 6px 12px" onchange="histDim=this.value;render()">
       <option value="all" ${histDim==='all'?'selected':''}>Clima geral</option>
       ${DIMS.map(d=>`<option value="${d.id}" ${histDim===d.id?'selected':''}>${d.short}</option>`).join('')}
     </select></div>
@@ -998,7 +1025,7 @@ function newAction(dimId){
     <label class="f">Objetivo</label><input class="in" id="a-goal" placeholder="Ex.: conversas mais leves">
     <label class="f">Ação concreta</label><input class="in" id="a-act" placeholder="Ex.: 20 min sem celular, 3x na semana">
     <label class="f">Responsável</label><select class="in" id="a-own"><option value="both">Ambos</option><option value="p0">${esc(nameOf('p0'))}</option><option value="p1">${esc(nameOf('p1'))}</option></select>
-    <label class="f">Prazo</label><input class="in" type="date" id="a-due" value="${new Date(Date.now()+7*864e5).toISOString().slice(0,10)}">
+    <label class="f">Prazo</label><input class="in" type="date" id="a-due" value="${localISO(new Date(Date.now()+7*864e5))}">
     <button class="btn btn-primary btn-block" style="margin-top:18px" onclick="saveAction()">Salvar ação</button>`);
 }
 function saveAction(){
@@ -1030,7 +1057,7 @@ function viewMais(){
   return `<section class="hero"><h1>Mais</h1></section><div class="card menu">${items.map(([id,ic,t,s])=>`<button onclick="go('mais','${id}')"><span class="mi">${ic}</span><span class="mt"><b>${esc(t)}</b><span>${esc(s)}</span></span>›</button>`).join('')}</div>
   <p class="tiny muted" style="text-align:center;margin:18px 0">ELO ${APP_VERSION} · Dois caminhos, um só elo.</p>`;
 }
-function recRow(r){ return `<div class="list-item"><div class="row between"><span class="pill ${cls(r.from)}">${esc(nameOf(r.from))} → ${esc(nameOf(other(r.from)))}</span><span class="tiny muted">${fmtDate(r.at)}</span></div><div class="small" style="margin-top:6px">${esc(r.text)}</div></div>`; }
+function recRow(r){ return `<div class="list-item"><div class="row between"><span class="pill wrap ${cls(r.from)}">${esc(nameOf(r.from))} → ${esc(nameOf(other(r.from)))}</span><span class="tiny muted">${fmtDate(r.at)}</span></div><div class="small" style="margin-top:6px">${esc(r.text)}</div></div>`; }
 function viewRecs(){
   const {pos,neg}=positiveRatio(30);
   const list=[...S.recognitions].sort((a,b)=>b.at.localeCompare(a.at));
@@ -1167,12 +1194,12 @@ function importData(input){
   const rd=new FileReader();
   rd.onload=()=>{ try{
     const d=JSON.parse(rd.result).data; if(!d||!d.rounds) throw 0;
-    Object.values(d.rounds).forEach(r=>{
+    Object.values(d.rounds).filter(r=>r&&validWeek(r.week)&&r.entries).forEach(r=>{
       const cur=S.rounds[r.week]||(S.rounds[r.week]={id:r.week,week:r.week,entries:{}});
       ['p0','p1'].forEach(p=>{ const inc=r.entries[p]; if(!inc||inc.hidden) return; const ex=cur.entries[p];
         if(!ex || (inc.at||'')>(ex.at||'')) cur.entries[p]={...inc, safety: ex?ex.safety:undefined}; });
     });
-    const mergeArr=(k)=>{ const map=new Map(S[k].map(x=>[x.id,x])); (d[k]||[]).forEach(x=>{ const ex=map.get(x.id); if(!ex) map.set(x.id,x); else if(k==='actions'&&x.status==='done'&&ex.status!=='done') map.set(x.id,x); else if(k==='conflicts'&&x.repairedAt&&!ex.repairedAt) map.set(x.id,x); }); S[k]=[...map.values()]; };
+    const mergeArr=(k)=>{ const map=new Map(S[k].map(x=>[x.id,x])); (d[k]||[]).filter(x=>x&&validId(x.id)).forEach(x=>{ const ex=map.get(x.id); if(!ex) map.set(x.id,x); else if(k==='actions'&&x.status==='done'&&ex.status!=='done') map.set(x.id,x); else if(k==='conflicts'&&x.repairedAt&&!ex.repairedAt) map.set(x.id,x); }); S[k]=[...map.values()]; };
     ['actions','recognitions','conflicts'].forEach(mergeArr);
     if(!S.onboarded && d.partners){ S.partners=d.partners.map(p=>({name:p.name,pin:null})); S.onboarded=true; }
     save(); toast('Dados mesclados ✓'); render();
