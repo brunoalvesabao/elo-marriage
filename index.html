@@ -1,0 +1,908 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="ELO">
+<meta name="theme-color" content="#F6F3EE" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#141816" media="(prefers-color-scheme: dark)">
+<meta name="description" content="ELO — Alinhamento. Cuidado. Evolução. Uma ferramenta para casais acompanharem e fortalecerem o relacionamento.">
+<title>ELO</title>
+<link rel="apple-touch-icon" href="data:image/png;base64,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">
+<link rel="icon" type="image/png" href="data:image/png;base64,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">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.js"></script>
+<style>
+:root{
+  --bg:#F6F3EE; --surface:#FFFFFF; --surface-2:#F0ECE5; --line:#E4DED4;
+  --text:#1F2523; --muted:#6B706C; --faint:#9CA09B;
+  --a:#2F5D62; --a-soft:#DCE8E6; --b:#B9785A; --b-soft:#F3E3DA;
+  --accent:#2F5D62; --good:#3E7B5A; --good-soft:#E0EFE5;
+  --warn:#A87522; --warn-soft:#F6EBD6; --alert:#A4513F; --alert-soft:#F5E1DB;
+  --shadow:0 1px 2px rgba(30,30,20,.04),0 4px 16px rgba(30,30,20,.05);
+  --radius:18px; --serif:'Fraunces',Georgia,serif; --sans:'Inter',system-ui,-apple-system,sans-serif;
+  --safe-b:env(safe-area-inset-bottom,0px); --safe-t:env(safe-area-inset-top,0px);
+}
+@media (prefers-color-scheme:dark){
+  :root{
+    --bg:#141816; --surface:#1C211F; --surface-2:#232927; --line:#2E3532;
+    --text:#ECEAE4; --muted:#A3A8A3; --faint:#6F756F;
+    --a:#7FB3AE; --a-soft:#22332F; --b:#E0A585; --b-soft:#3A2A22;
+    --accent:#7FB3AE; --good:#7CC39A; --good-soft:#1F3328;
+    --warn:#E0B464; --warn-soft:#3A2F1A; --alert:#E38F7B; --alert-soft:#3D2621;
+    --shadow:0 1px 2px rgba(0,0,0,.3);
+  }
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{background:var(--bg)}
+body{font-family:var(--sans);color:var(--text);font-size:15px;line-height:1.5;-webkit-font-smoothing:antialiased;-webkit-tap-highlight-color:transparent;padding-bottom:calc(84px + var(--safe-b));min-height:100vh}
+button,input,textarea,select{font:inherit;color:inherit}
+button{cursor:pointer;border:none;background:none}
+.wrap{max-width:560px;margin:0 auto;padding:0 16px}
+header.top{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);padding-top:var(--safe-t)}
+header.top .wrap{display:flex;align-items:center;justify-content:space-between;height:60px}
+.brand{display:flex;align-items:center;gap:10px}
+.brand .logo{width:34px;height:22px}
+.brand b{font-family:var(--serif);font-size:22px;font-weight:600;letter-spacing:.02em}
+.who{display:flex;align-items:center;gap:8px;padding:6px 12px 6px 6px;border-radius:999px;background:var(--surface);box-shadow:var(--shadow);font-size:13px;font-weight:600}
+.avatar{width:26px;height:26px;border-radius:50%;display:grid;place-items:center;color:#fff;font-size:12px;font-weight:700}
+.av-a{background:var(--a)} .av-b{background:var(--b)}
+@media (prefers-color-scheme:dark){.avatar{color:#141816}}
+h1{font-family:var(--serif);font-weight:600;font-size:28px;line-height:1.15;letter-spacing:-.01em}
+h2{font-family:var(--serif);font-weight:600;font-size:20px;line-height:1.25}
+h3{font-size:14px;font-weight:600}
+.eyebrow{font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.muted{color:var(--muted)} .small{font-size:13px} .tiny{font-size:12px}
+.hero{padding:18px 0 8px}
+.hero p{color:var(--muted);margin-top:6px}
+.card{background:var(--surface);border-radius:var(--radius);box-shadow:var(--shadow);padding:18px;margin:12px 0}
+.card.flat{box-shadow:none;border:1px solid var(--line)}
+.card-h{display:flex;justify-content:space-between;align-items:baseline;gap:8px;margin-bottom:12px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:12px 0}
+.grid2 .card{margin:0}
+.stat .v{font-family:var(--serif);font-size:30px;font-weight:600;line-height:1.1;margin-top:6px}
+.stat .v small{font-size:14px;color:var(--muted);font-family:var(--sans);font-weight:500}
+.stat .s{font-size:12px;color:var(--muted);margin-top:4px}
+.up{color:var(--good)} .down{color:var(--alert)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;height:48px;padding:0 20px;border-radius:14px;font-weight:600;font-size:15px;transition:transform .12s ease,opacity .12s}
+.btn:active{transform:scale(.97)}
+.btn-primary{background:var(--accent);color:var(--bg)}
+.btn-ghost{background:var(--surface-2);color:var(--text)}
+.btn-line{border:1px solid var(--line);background:var(--surface)}
+.btn-sm{height:36px;padding:0 14px;font-size:13px;border-radius:10px}
+.btn-block{width:100%}
+.btn[disabled]{opacity:.4;pointer-events:none}
+.row{display:flex;gap:10px;align-items:center}
+.row.between{justify-content:space-between}
+.stack>*+*{margin-top:10px}
+.pill{display:inline-flex;align-items:center;gap:6px;height:26px;padding:0 10px;border-radius:999px;font-size:12px;font-weight:600;background:var(--surface-2);color:var(--muted)}
+.pill.good{background:var(--good-soft);color:var(--good)}
+.pill.warn{background:var(--warn-soft);color:var(--warn)}
+.pill.alert{background:var(--alert-soft);color:var(--alert)}
+.pill.a{background:var(--a-soft);color:var(--a)} .pill.b{background:var(--b-soft);color:var(--b)}
+.dots{display:inline-flex;gap:4px}
+.dots i{width:9px;height:9px;border-radius:50%;background:var(--line);display:block}
+.dots.a i.on{background:var(--a)} .dots.b i.on{background:var(--b)}
+.dim{padding:12px 0;border-top:1px solid var(--line)}
+.dim:first-child{border-top:none;padding-top:0}
+.dim-top{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.dim-name{font-weight:600;font-size:14px}
+.dim-scores{display:flex;flex-direction:column;gap:5px;margin-top:8px}
+.dim-scores .r{display:flex;align-items:center;gap:10px;font-size:12px;color:var(--muted)}
+.dim-scores .r span:first-child{width:74px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.comment{margin-top:8px;font-size:13px;color:var(--muted);background:var(--surface-2);border-radius:10px;padding:8px 10px}
+.signal{display:flex;gap:12px;padding:12px;border-radius:14px;margin-top:8px}
+.signal .ic{font-size:18px;line-height:1.3}
+.signal b{display:block;font-size:14px}
+.signal p{font-size:13px;margin-top:2px;opacity:.9}
+.signal.alert{background:var(--alert-soft);color:var(--alert)}
+.signal.warn{background:var(--warn-soft);color:var(--warn)}
+.signal.good{background:var(--good-soft);color:var(--good)}
+.signal.info{background:var(--a-soft);color:var(--a)}
+.quote{border-left:3px solid var(--line);padding:4px 0 4px 12px;margin-top:10px}
+.quote .by{font-size:12px;font-weight:600;margin-bottom:2px}
+nav.tabs{position:fixed;left:0;right:0;bottom:0;z-index:30;background:color-mix(in srgb,var(--surface) 94%,transparent);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-top:1px solid var(--line);padding-bottom:var(--safe-b)}
+nav.tabs .wrap{display:flex;justify-content:space-around;height:64px;align-items:center;padding:0 4px}
+nav.tabs button{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;font-size:11px;font-weight:600;color:var(--faint);padding:6px 0}
+nav.tabs button svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+nav.tabs button.on{color:var(--accent)}
+label.f{display:block;font-size:13px;font-weight:600;margin:14px 0 6px}
+input.in,textarea.in,select.in{width:100%;background:var(--surface-2);border:1px solid transparent;border-radius:12px;padding:12px 14px;font-size:16px;outline:none;transition:border .15s}
+input.in:focus,textarea.in:focus,select.in:focus{border-color:var(--accent)}
+textarea.in{min-height:92px;resize:vertical;line-height:1.45}
+.scale{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin-top:10px}
+.scale button{height:46px;border-radius:12px;background:var(--surface-2);font-weight:700;font-size:16px;transition:all .12s}
+.scale button.on{background:var(--accent);color:var(--bg);transform:scale(1.04)}
+.scale-legend{display:flex;justify-content:space-between;font-size:11px;color:var(--faint);margin-top:6px}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+.chip{height:38px;padding:0 14px;border-radius:999px;background:var(--surface-2);font-size:14px;font-weight:500;border:1px solid transparent}
+.chip.on{background:var(--a-soft);color:var(--a);border-color:var(--a)}
+.moods{display:grid;gap:8px;margin-top:10px}
+.mood{display:flex;align-items:center;gap:14px;padding:14px;border-radius:14px;background:var(--surface-2);text-align:left;border:1.5px solid transparent;font-weight:500}
+.mood .e{font-size:24px}
+.mood.on{border-color:var(--accent);background:var(--a-soft)}
+.progress{height:4px;background:var(--line);border-radius:4px;overflow:hidden;margin:6px 0 16px}
+.progress i{display:block;height:100%;background:var(--accent);transition:width .3s}
+.hints{margin-top:8px;padding-left:18px;font-size:13px;color:var(--muted)}
+.hints li+li{margin-top:2px}
+.yn{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}
+.yn button{height:42px;border-radius:12px;background:var(--surface-2);font-weight:600}
+.yn button.on.y{background:var(--alert-soft);color:var(--alert)}
+.yn button.on.n{background:var(--good-soft);color:var(--good)}
+.list-item{padding:14px 0;border-top:1px solid var(--line)}
+.list-item:first-child{border-top:none;padding-top:0}
+.seg{display:flex;background:var(--surface-2);border-radius:12px;padding:3px;gap:3px}
+.seg button{flex:1;height:34px;border-radius:9px;font-size:13px;font-weight:600;color:var(--muted)}
+.seg button.on{background:var(--surface);color:var(--text);box-shadow:var(--shadow)}
+.menu button{display:flex;width:100%;align-items:center;gap:14px;padding:14px 4px;border-top:1px solid var(--line);text-align:left}
+.menu button:first-child{border-top:none}
+.menu .mi{width:38px;height:38px;border-radius:12px;display:grid;place-items:center;background:var(--surface-2);font-size:18px}
+.menu .mt{flex:1}
+.menu .mt b{display:block;font-size:15px;font-weight:600}
+.menu .mt span{font-size:12px;color:var(--muted)}
+.back{display:inline-flex;align-items:center;gap:4px;color:var(--muted);font-size:14px;font-weight:600;padding:12px 0 0}
+.empty{text-align:center;padding:24px 12px;color:var(--muted);font-size:14px}
+.chart-box{position:relative;width:100%}
+.modal-bg{position:fixed;inset:0;background:rgba(10,12,10,.45);z-index:50;display:flex;align-items:flex-end;justify-content:center;animation:fade .2s}
+.modal{background:var(--surface);width:100%;max-width:560px;border-radius:22px 22px 0 0;padding:22px 18px calc(22px + var(--safe-b));max-height:90vh;overflow:auto;animation:up .25s ease}
+@media (min-width:640px){.modal-bg{align-items:center}.modal{border-radius:22px}}
+@keyframes fade{from{opacity:0}}
+@keyframes up{from{transform:translateY(30px);opacity:0}}
+.view{animation:fade .25s}
+.toast{position:fixed;left:50%;bottom:calc(96px + var(--safe-b));transform:translateX(-50%);background:var(--text);color:var(--bg);padding:10px 18px;border-radius:12px;font-size:14px;font-weight:600;z-index:60;animation:up .2s}
+.onb{min-height:100vh;display:flex;flex-direction:column;justify-content:center;padding:32px 0}
+.onb .logo-big{width:80px;height:52px;margin-bottom:22px}
+.rule{background:var(--surface);border-radius:var(--radius);padding:20px;margin:22px 0;border:1px solid var(--line)}
+.rule h3{font-family:var(--serif);font-size:18px;margin-bottom:6px}
+.check{display:flex;gap:12px;align-items:flex-start;margin:14px 0;font-size:14px}
+.check input{width:20px;height:20px;accent-color:var(--accent);margin-top:2px;flex:none}
+.steps li{margin:10px 0 0 18px;font-size:14px}
+.steps li b{font-weight:600}
+.resource{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px 0;border-top:1px solid color-mix(in srgb,currentColor 20%,transparent)}
+.resource:first-of-type{border-top:none}
+.resource a{font-weight:700;color:inherit;text-decoration:none;font-size:18px;white-space:nowrap}
+.pin{display:flex;gap:10px;justify-content:center;margin:16px 0}
+.pin input{width:52px;height:58px;text-align:center;font-size:24px;font-weight:700;border-radius:14px;background:var(--surface-2);border:1.5px solid transparent;outline:none}
+.pin input:focus{border-color:var(--accent)}
+.hidden{display:none!important}
+</style>
+</head>
+<body>
+<div id="app"></div>
+
+<script>
+/* =========================================================================
+   ELO — Alinhamento. Cuidado. Evolução.
+   Versão 1 (arquivo único). Os dados ficam no aparelho (localStorage).
+   Camada de armazenamento isolada em Store — trocar por Supabase depois.
+   ========================================================================= */
+
+const APP_VERSION = '1.0.0';
+const STORAGE_KEY = 'elo.v1';
+
+/* ---------- Dimensões ---------- */
+const DIMS = [
+  { id:'comunicacao', name:'Comunicação', short:'Comunicação',
+    desc:'Escuta, tom de voz, críticas e reclamações, e a capacidade de falar de assuntos difíceis.',
+    hints:['Fui ouvido(a) quando falei?','As conversas terminaram em solução ou em reclamação?','Conseguimos discordar sem atacar?'] },
+  { id:'seguranca', name:'Segurança Emocional', short:'Segurança',
+    desc:'Sentir-se respeitado(a) e livre para falar, sem medo de gritos, humilhação ou explosões.',
+    hints:['Houve gritos ou ofensas nesta semana?','Senti que podia discordar com tranquilidade?','Me senti respeitado(a) na frente das crianças?'] },
+  { id:'familia', name:'Família e Filhos', short:'Família',
+    desc:'Clima da casa, paciência e respeito com todas as crianças, regras combinadas e parceria na criação.',
+    hints:['As crianças viveram uma casa tranquila nesta semana?','Estivemos alinhados nas regras e na disciplina?','Todas as crianças foram tratadas com o mesmo cuidado?'] },
+  { id:'parceria', name:'Parceria', short:'Parceria',
+    desc:'Divisão de tarefas, dinheiro e decisões, e o reconhecimento do esforço de cada um.',
+    hints:['A carga da casa pareceu justa?','Meu esforço foi percebido?','Percebi e agradeci o esforço do outro?'] },
+  { id:'presenca', name:'Presença e Conexão', short:'Presença',
+    desc:'Tempo de qualidade, atenção sem celular, interesse genuíno pelo dia do outro.',
+    hints:['Tivemos algum tempo só nosso?','O celular atrapalhou nossos momentos?','Me senti interessante para o outro?'] },
+  { id:'afeto', name:'Afeto e Intimidade', short:'Intimidade',
+    desc:'Carinho, toque, desejo e a liberdade de falar sobre necessidades — sempre com respeito aos limites e ao consentimento.',
+    hints:['Houve carinho fora do contexto sexual?','Consegui falar do que desejo sem pressão nem culpa?','Um "não" foi recebido com respeito, e um convite com gentileza?'] },
+  { id:'confianca', name:'Confiança e História', short:'Confiança',
+    desc:'Transparência, feridas antigas, perdão e a reconstrução da confiança.',
+    hints:['Me senti seguro(a) sobre a lealdade do outro?','Feridas antigas voltaram nas discussões?','Fomos transparentes um com o outro?'] },
+  { id:'reparacao', name:'Reparação e Reconciliação', short:'Reparação',
+    desc:'O que acontece depois do conflito: voltar a conversar, assumir a própria parte, pedir e aceitar desculpas.',
+    hints:['Depois de brigar, voltamos a conversar?','Reconheci a minha parcela de responsabilidade?','Quanto tempo ficamos afastados?'] },
+  { id:'proposito', name:'Propósito e Valores', short:'Propósito',
+    desc:'Projeto de vida, fé e princípios, futuro da família e objetivos em comum.',
+    hints:['Estamos sonhando algo juntos?','Nossos valores guiaram as decisões desta semana?','Sinto que caminhamos na mesma direção?'] }
+];
+const SCALE_LABELS = {1:'Muito difícil',2:'Difícil',3:'Oscilando',4:'Bem',5:'Muito bem'};
+const MOODS = [
+  {id:5,e:'❤️',t:'Muito conectado(a)'},
+  {id:4,e:'🙂',t:'Bem'},
+  {id:3,e:'😐',t:'Neutro(a)'},
+  {id:2,e:'😔',t:'Distante ou magoado(a)'},
+  {id:1,e:'🌧️',t:'Em crise'}
+];
+const FACTORS = ['Comunicação','Família','Dinheiro','Trabalho','Intimidade','Tempo juntos','Tarefas da casa','Confiança','Celular','Saúde','Outro'];
+const SAFETY_Q = [
+  {id:'fisica', q:'Nesta semana houve agressão física entre adultos da casa?'},
+  {id:'crianca', q:'Alguma criança foi machucada, ameaçada ou exposta a agressão?'},
+  {id:'medo', q:'Você sentiu medo de falar ou de estar em casa?'},
+  {id:'ameaca', q:'Houve ameaças, humilhações ou xingamentos pesados?'}
+];
+
+/* ---------- Utilidades ---------- */
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2,8);
+const avg = a => a.length ? a.reduce((x,y)=>x+y,0)/a.length : null;
+const fmt1 = n => n == null ? '—' : n.toFixed(1).replace('.',',');
+const todayISO = () => new Date().toISOString().slice(0,10);
+const fmtDate = iso => { if(!iso) return ''; const d = new Date(iso.length===10 ? iso+'T12:00:00' : iso); return d.toLocaleDateString('pt-BR',{day:'2-digit',month:'short'}); };
+const daysBetween = (a,b) => Math.round((new Date(b) - new Date(a)) / 86400000);
+
+function isoWeek(date = new Date()){
+  const d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
+  const day = d.getUTCDay() || 7;
+  d.setUTCDate(d.getUTCDate() + 4 - day);
+  const y = d.getUTCFullYear();
+  const w = Math.ceil(((d - Date.UTC(y,0,1)) / 86400000 + 1) / 7);
+  return `${y}-W${String(w).padStart(2,'0')}`;
+}
+function weekLabel(key){
+  const [y,w] = key.split('-W').map(Number);
+  const jan4 = new Date(Date.UTC(y,0,4));
+  const mon = new Date(jan4); mon.setUTCDate(jan4.getUTCDate() - ((jan4.getUTCDay()||7) - 1) + (w-1)*7);
+  const sun = new Date(mon); sun.setUTCDate(mon.getUTCDate()+6);
+  const f = d => d.toLocaleDateString('pt-BR',{day:'2-digit',month:'short',timeZone:'UTC'});
+  return `${f(mon)} – ${f(sun)}`;
+}
+async function sha(s){
+  try{ const b = await crypto.subtle.digest('SHA-256', new TextEncoder().encode('elo:'+s));
+       return [...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join(''); }
+  catch(e){ return 'plain:'+s; }
+}
+
+/* ---------- Armazenamento (trocar por Supabase no futuro) ---------- */
+const Store = {
+  blank(){
+    return { version:APP_VERSION, onboarded:false,
+      partners:[{name:'',pin:null},{name:'',pin:null}],
+      rounds:{}, actions:[], recognitions:[], conflicts:[],
+      private:{p0:[],p1:[]}, createdAt:new Date().toISOString() };
+  },
+  load(){
+    try{ const raw = localStorage.getItem(STORAGE_KEY); if(raw) return Object.assign(this.blank(), JSON.parse(raw)); }
+    catch(e){}
+    return this.blank();
+  },
+  save(s){ try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(s)); }catch(e){ toast('Não foi possível salvar neste aparelho'); } }
+};
+let S = Store.load();
+let me = null;                // 'p0' | 'p1'
+let view = 'home';
+let sub = null;               // subpágina da aba "Mais"
+let draft = null;             // rascunho do check-in
+let charts = [];
+let histPeriod = 4, histDim = 'all';
+try{ const last = localStorage.getItem('elo.me'); if(last==='p0'||last==='p1') me = last; }catch(e){}
+
+const save = () => Store.save(S);
+const other = p => p==='p0' ? 'p1' : 'p0';
+const nameOf = p => S.partners[p==='p0'?0:1].name || (p==='p0'?'Parceiro 1':'Parceiro 2');
+const cls = p => p==='p0' ? 'a' : 'b';
+const initial = p => (nameOf(p)[0]||'?').toUpperCase();
+
+/* ---------- Cálculos ---------- */
+function roundsSorted(){ return Object.values(S.rounds).sort((a,b)=>a.week.localeCompare(b.week)); }
+function isComplete(r){ return r && r.entries && r.entries.p0 && r.entries.p1; }
+function completeRounds(){ return roundsSorted().filter(isComplete); }
+function scoreOf(entry, dim){ return entry && entry.scores ? entry.scores[dim] : null; }
+function roundMetrics(r){
+  const dims = DIMS.map(d => {
+    const a = scoreOf(r.entries.p0,d.id), b = scoreOf(r.entries.p1,d.id);
+    return { ...d, a, b, mean:(a+b)/2, gap:Math.abs(a-b) };
+  });
+  const clima = avg(dims.map(d=>d.mean));
+  const align = Math.round(100 - avg(dims.map(d=>d.gap)) / 4 * 100);
+  const maxGap = [...dims].sort((x,y)=>y.gap-x.gap)[0];
+  const priority = [...dims].sort((x,y)=>x.mean-y.mean || y.gap-x.gap)[0];
+  return { dims, clima, align, maxGap, priority };
+}
+function trendFor(dimId, n=4){
+  const rs = completeRounds().slice(-n);
+  const vals = rs.map(r => dimId==='all' ? roundMetrics(r).clima : roundMetrics(r).dims.find(d=>d.id===dimId).mean);
+  if(vals.length < 2) return {label:'Poucos dados', cls:''};
+  const diff = vals[vals.length-1] - vals[0];
+  const m = avg(vals), sd = Math.sqrt(avg(vals.map(v=>(v-m)**2)));
+  if(diff >= .5) return {label:'Melhorando', cls:'good'};
+  if(diff <= -.5) return {label:'Precisa de atenção', cls:'alert'};
+  if(sd >= .7) return {label:'Oscilando', cls:'warn'};
+  return {label:'Estável', cls:''};
+}
+function positiveRatio(days=30){
+  const since = Date.now() - days*86400000;
+  const pos = S.recognitions.filter(r=>new Date(r.at) >= since).length;
+  const neg = S.conflicts.filter(c=>new Date(c.date+'T12:00:00') >= since).length;
+  return {pos, neg};
+}
+
+/* ---------- Infra de UI ---------- */
+function toast(msg){ const t=document.createElement('div'); t.className='toast'; t.textContent=msg; document.body.appendChild(t); setTimeout(()=>t.remove(),2200); }
+function destroyCharts(){ charts.forEach(c=>c.destroy()); charts=[]; }
+function css(v){ return getComputedStyle(document.documentElement).getPropertyValue(v).trim(); }
+function dots(n, c){ return `<span class="dots ${c}">${[1,2,3,4,5].map(i=>`<i class="${n>=i?'on':''}"></i>`).join('')}</span>`; }
+function modal(html){
+  closeModal();
+  const bg=document.createElement('div'); bg.className='modal-bg'; bg.id='modal';
+  bg.innerHTML=`<div class="modal">${html}</div>`;
+  bg.addEventListener('click',e=>{ if(e.target===bg) closeModal(); });
+  document.body.appendChild(bg);
+}
+function closeModal(){ const m=$('#modal'); if(m) m.remove(); }
+
+const ICONS = {
+  home:'<path d="M3 11.5 12 4l9 7.5"/><path d="M5 10v10h14V10"/>',
+  checkin:'<rect x="4" y="3" width="16" height="18" rx="3"/><path d="m8.5 12 2.5 2.5 4.5-5"/>',
+  evolucao:'<path d="M4 19V5"/><path d="M4 19h16"/><path d="m7 15 4-4 3 3 5-6"/>',
+  acoes:'<circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="4"/><circle cx="12" cy="12" r=".5"/>',
+  mais:'<circle cx="5" cy="12" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/>'
+};
+const LOGO = `<svg class="logo" viewBox="0 0 68 44" aria-hidden="true"><circle cx="24" cy="22" r="16" fill="none" stroke="var(--a)" stroke-width="5"/><circle cx="44" cy="22" r="16" fill="none" stroke="var(--b)" stroke-width="5"/></svg>`;
+
+function shell(content){
+  const tabs = [['home','Início'],['checkin','Check-in'],['evolucao','Evolução'],['acoes','Ações'],['mais','Mais']];
+  return `
+  <header class="top"><div class="wrap">
+    <div class="brand">${LOGO}<b>ELO</b></div>
+    <button class="who" onclick="switchUser()"><span class="avatar av-${cls(me)}">${esc(initial(me))}</span>${esc(nameOf(me))}</button>
+  </div></header>
+  <main class="wrap view">${content}</main>
+  <nav class="tabs"><div class="wrap">
+    ${tabs.map(([id,t])=>`<button class="${view===id?'on':''}" onclick="go('${id}')"><svg viewBox="0 0 24 24">${ICONS[id]}</svg>${t}</button>`).join('')}
+  </div></nav>`;
+}
+
+function go(v, s=null){ view=v; sub=s; render(); window.scrollTo(0,0); }
+
+function render(){
+  destroyCharts();
+  const app = $('#app');
+  if(!S.onboarded){ app.innerHTML = viewOnboarding(); return; }
+  if(!me){ app.innerHTML = viewPickUser(); return; }
+  const V = {home:viewHome, checkin:viewCheckin, evolucao:viewEvolucao, acoes:viewAcoes, mais:viewMais}[view] || viewHome;
+  app.innerHTML = shell(V());
+  afterRender();
+}
+function afterRender(){
+  if(view==='home') drawRadar();
+  if(view==='evolucao') drawHistory();
+}
+
+/* ---------- Onboarding ---------- */
+function viewOnboarding(){
+  return `<div class="wrap onb view">
+    <svg class="logo-big" viewBox="0 0 68 44"><circle cx="24" cy="22" r="16" fill="none" stroke="var(--a)" stroke-width="4"/><circle cx="44" cy="22" r="16" fill="none" stroke="var(--b)" stroke-width="4"/></svg>
+    <div class="eyebrow">Alinhamento · Cuidado · Evolução</div>
+    <h1 style="margin-top:8px">Não é sobre medir o amor.<br>É sobre cuidar do que mantém duas pessoas conectadas.</h1>
+    <div class="rule">
+      <h3>A regra de ouro</h3>
+      <p class="small muted">O ELO não é uma arma. Ele não serve para provar quem está certo, cobrar o outro ou vencer uma discussão. Ele mostra onde o relacionamento precisa de atenção — para que vocês dois cuidem disso como equipe.</p>
+      <ol class="steps small">
+        <li><b>Cada um responde sozinho.</b> As notas só aparecem quando os dois terminarem.</li>
+        <li><b>Diferença não é erro.</b> Um gap de percepção é convite para perguntar, não para acusar.</li>
+        <li><b>Registrem o que funciona.</b> Reconhecer o outro vale tanto quanto apontar problemas.</li>
+      </ol>
+    </div>
+    <label class="f">Nome de quem está configurando</label>
+    <input class="in" id="n0" placeholder="Seu nome" autocomplete="given-name">
+    <label class="f">Nome do(a) parceiro(a)</label>
+    <input class="in" id="n1" placeholder="Nome do(a) parceiro(a)">
+    <label class="check"><input type="checkbox" id="agree"><span>Concordamos em usar o ELO com honestidade, sem usar as respostas do outro como munição.</span></label>
+    <button class="btn btn-primary btn-block" onclick="finishOnboarding()">Começar</button>
+    <p class="tiny muted" style="margin-top:14px;text-align:center">Nesta versão os dados ficam só neste aparelho. Nada é enviado para servidores.</p>
+    <div class="card flat" style="margin-top:18px"><p class="small"><b>O outro já configurou no celular dele(a)?</b></p><p class="tiny muted" style="margin-top:4px">Não crie de novo: peça o arquivo de sincronização e importe aqui, para que os nomes fiquem na mesma ordem.</p>
+    <label class="btn btn-line btn-block" style="margin-top:10px">Importar arquivo<input type="file" accept="application/json,.json" class="hidden" onchange="importData(this)"></label></div>
+  </div>`;
+}
+function finishOnboarding(){
+  const a=$('#n0').value.trim(), b=$('#n1').value.trim();
+  if(!a||!b) return toast('Preencha os dois nomes');
+  if(!$('#agree').checked) return toast('Marque o acordo para continuar');
+  S.partners[0].name=a; S.partners[1].name=b; S.onboarded=true; save();
+  setMe('p0'); render();
+}
+
+/* ---------- Troca de usuário / PIN ---------- */
+function setMe(p){ me=p; try{ localStorage.setItem('elo.me',p); }catch(e){} }
+function viewPickUser(){
+  return `<div class="wrap onb view">
+    ${LOGO.replace('class="logo"','class="logo-big"')}
+    <h1>Quem está usando agora?</h1>
+    <p class="muted" style="margin-top:6px">Cada um tem o seu check-in e o seu espaço privado.</p>
+    <div class="stack" style="margin-top:22px">
+      ${['p0','p1'].map(p=>`<button class="card row" style="width:100%;text-align:left;margin:0" onclick="pickUser('${p}')">
+        <span class="avatar av-${cls(p)}" style="width:40px;height:40px;font-size:16px">${esc(initial(p))}</span>
+        <span style="flex:1"><b>${esc(nameOf(p))}</b><br><span class="tiny muted">${S.partners[p==='p0'?0:1].pin?'Protegido por PIN':'Sem PIN'}</span></span>›
+      </button>`).join('')}
+    </div></div>`;
+}
+function switchUser(){
+  modal(`<h2>Trocar de pessoa</h2><p class="small muted" style="margin:4px 0 14px">Quem vai usar o ELO agora?</p>
+    <div class="stack">${['p0','p1'].map(p=>`<button class="btn btn-line btn-block" style="justify-content:flex-start" onclick="closeModal();pickUser('${p}')"><span class="avatar av-${cls(p)}">${esc(initial(p))}</span>${esc(nameOf(p))}${p===me?' · atual':''}</button>`).join('')}</div>`);
+}
+function pickUser(p){
+  const pin = S.partners[p==='p0'?0:1].pin;
+  if(!pin || p===me){ setMe(p); render(); return; }
+  modal(`<h2>Olá, ${esc(nameOf(p))}</h2><p class="small muted">Digite seu PIN de 4 dígitos.</p>
+    <div class="pin">${[0,1,2,3].map(i=>`<input inputmode="numeric" maxlength="1" type="password" data-i="${i}">`).join('')}</div>
+    <button class="btn btn-primary btn-block" onclick="checkPin('${p}')">Entrar</button>`);
+  wirePin();
+}
+function wirePin(){
+  const ins=[...document.querySelectorAll('.pin input')];
+  ins.forEach((el,i)=>{ el.addEventListener('input',()=>{ el.value=el.value.replace(/\D/g,''); if(el.value&&ins[i+1]) ins[i+1].focus(); });
+    el.addEventListener('keydown',e=>{ if(e.key==='Backspace'&&!el.value&&ins[i-1]) ins[i-1].focus(); }); });
+  setTimeout(()=>ins[0]&&ins[0].focus(),100);
+}
+const pinValue = () => [...document.querySelectorAll('.pin input')].map(i=>i.value).join('');
+async function checkPin(p){
+  const v=pinValue(); if(v.length!==4) return toast('Digite os 4 dígitos');
+  if(await sha(v) === S.partners[p==='p0'?0:1].pin){ closeModal(); setMe(p); render(); }
+  else { toast('PIN incorreto'); document.querySelectorAll('.pin input').forEach(i=>i.value=''); wirePin(); }
+}
+
+/* ---------- Início ---------- */
+function viewHome(){
+  const wk = isoWeek(), r = S.rounds[wk];
+  const mineDone = r && r.entries && r.entries[me];
+  const theirsDone = r && r.entries && r.entries[other(me)];
+  const done = completeRounds();
+  const last = done[done.length-1];
+  const prev = done[done.length-2];
+  let html = `<section class="hero"><div class="eyebrow">Semana de ${weekLabel(wk)}</div><h1>Como está o nosso relacionamento?</h1></section>`;
+
+  // Status da semana
+  html += `<div class="card"><div class="card-h"><h3>Check-in desta semana</h3>${mineDone&&theirsDone?'<span class="pill good">Completo</span>':'<span class="pill">Em aberto</span>'}</div>
+    <div class="stack">
+      ${['p0','p1'].map(p=>{ const ok=r&&r.entries&&r.entries[p]; return `<div class="row between"><span class="row"><span class="avatar av-${cls(p)}">${esc(initial(p))}</span>${esc(nameOf(p))}</span><span class="pill ${ok?'good':''}">${ok?'Respondeu ✓':(p===me?'Falta você':'Aguardando')}</span></div>`; }).join('')}
+    </div>
+    ${!mineDone?`<button class="btn btn-primary btn-block" style="margin-top:14px" onclick="go('checkin')">Fazer meu check-in</button>`:''}
+    ${mineDone&&!theirsDone?`<p class="small muted" style="margin-top:12px">Suas respostas ficam guardadas. As notas dos dois aparecem juntas quando ${esc(nameOf(other(me)))} também responder.</p>`:''}
+  </div>`;
+
+  // Segurança privada
+  if(mineDone && r.entries[me].safety && Object.values(r.entries[me].safety).includes(true)) html += safetyCard();
+
+  if(!last){
+    html += `<div class="card flat empty">Ainda não há uma semana com os dois check-ins completos.<br>O painel aparece assim que os dois responderem.</div>`;
+    html += homeExtras();
+    return html;
+  }
+
+  const M = roundMetrics(last);
+  const PM = prev ? roundMetrics(prev) : null;
+  const delta = PM ? M.clima - PM.clima : null;
+  const dAlign = PM ? M.align - PM.align : null;
+  const isOld = last.week !== wk;
+
+  html += `<div class="row between" style="margin-top:22px"><h2>Panorama</h2><span class="tiny muted">${isOld?'Última semana completa · ':''}${weekLabel(last.week)}</span></div>
+  <div class="grid2">
+    <div class="card stat"><div class="eyebrow">Alinhamento</div><div class="v">${M.align}<small>%</small></div><div class="s">${dAlign==null?'Quão próximas estão as percepções':`<span class="${dAlign>=0?'up':'down'}">${dAlign>=0?'↑':'↓'} ${Math.abs(dAlign)} pts</span> vs semana anterior`}</div></div>
+    <div class="card stat"><div class="eyebrow">Clima médio</div><div class="v">${fmt1(M.clima)}<small> / 5</small></div><div class="s">${delta==null?'Média das 9 áreas':`<span class="${delta>=0?'up':'down'}">${delta>=0?'↑':'↓'} ${fmt1(Math.abs(delta))}</span> vs semana anterior`}</div></div>
+    <div class="card stat"><div class="eyebrow">Maior diferença</div><div class="v" style="font-size:20px">${M.maxGap.gap>0?esc(M.maxGap.short):'Nenhuma'}</div><div class="s">${M.maxGap.gap>0?`Gap de ${M.maxGap.gap} ${M.maxGap.gap===1?'ponto':'pontos'}`:'Vocês enxergam igual'}</div></div>
+    <div class="card stat"><div class="eyebrow">Prioridade</div><div class="v" style="font-size:20px">${esc(M.priority.short)}</div><div class="s">Área mais baixa para os dois</div></div>
+  </div>`;
+
+  // Sinais de atenção
+  html += `<div class="card"><div class="card-h"><h3>Sinais de atenção</h3></div>${signals(M, last)}</div>`;
+
+  // Radar
+  html += `<div class="card"><div class="card-h"><h3>Visão dos dois</h3><span class="tiny muted">linhas afastadas = conversar</span></div>
+    <div class="chart-box" style="height:320px"><canvas id="radar"></canvas></div></div>`;
+
+  // Áreas
+  html += `<div class="card"><div class="card-h"><h3>Áreas acompanhadas</h3><button class="tiny muted" onclick="go('evolucao')">Ver evolução ›</button></div>
+    ${M.dims.map(d=>{
+      const ca = last.entries.p0.notes?.[d.id], cb = last.entries.p1.notes?.[d.id];
+      return `<div class="dim"><div class="dim-top"><span class="dim-name">${esc(d.name)}</span>${d.gap>=2?`<span class="pill warn">gap ${d.gap}</span>`:d.mean<=2?'<span class="pill alert">atenção</span>':''}</div>
+      <div class="dim-scores">
+        <div class="r"><span>${esc(nameOf('p0'))}</span>${dots(d.a,'a')}</div>
+        <div class="r"><span>${esc(nameOf('p1'))}</span>${dots(d.b,'b')}</div>
+      </div>
+      ${ca?`<div class="comment"><b>${esc(nameOf('p0'))}:</b> ${esc(ca)}</div>`:''}
+      ${cb?`<div class="comment"><b>${esc(nameOf('p1'))}:</b> ${esc(cb)}</div>`:''}
+      ${(d.mean<=2.5||d.gap>=2)?`<button class="btn btn-ghost btn-sm" style="margin-top:8px" onclick="newAction('${d.id}')">+ Criar ação para esta área</button>`:''}
+      </div>`; }).join('')}
+  </div>`;
+
+  // Mensagens
+  const msgs = ['p0','p1'].map(p=>({p, t:last.entries[p].understand, rec:last.entries[p].recognize, mood:last.entries[p].mood}));
+  html += `<div class="card"><div class="card-h"><h3>O que cada um quer que o outro entenda</h3></div>
+    ${msgs.map(m=>`<div class="quote" style="border-color:var(--${cls(m.p)})"><div class="by" style="color:var(--${cls(m.p)})">${esc(nameOf(m.p))} · ${MOODS.find(x=>x.id===m.mood)?.e||''} ${esc(MOODS.find(x=>x.id===m.mood)?.t||'')}</div><div class="small">${m.t?esc(m.t):'<span class="muted">Sem mensagem nesta semana.</span>'}</div></div>`).join('')}
+    <p class="tiny muted" style="margin-top:12px">Leiam com curiosidade. A pergunta que ajuda é: “me conta mais sobre isso?”</p>
+  </div>`;
+
+  html += homeExtras();
+  return html;
+}
+function homeExtras(){
+  let html='';
+  const open = S.actions.filter(a=>a.status!=='done');
+  html += `<div class="card"><div class="card-h"><h3>Ações em andamento</h3><button class="tiny muted" onclick="go('acoes')">Todas ›</button></div>
+    ${open.length? open.slice(0,3).map(actionRow).join('') : '<div class="empty" style="padding:8px">Nenhuma ação aberta. Escolham uma pequena atitude para esta semana.</div>'}
+    <button class="btn btn-ghost btn-sm" style="margin-top:10px" onclick="newAction()">+ Nova ação</button></div>`;
+  const recs = [...S.recognitions].sort((a,b)=>b.at.localeCompare(a.at)).slice(0,3);
+  html += `<div class="card"><div class="card-h"><h3>Reconhecimentos recentes</h3><button class="tiny muted" onclick="go('mais','reconhecimentos')">Todos ›</button></div>
+    ${recs.length? recs.map(recRow).join('') : '<div class="empty" style="padding:8px">Nada registrado ainda. O que o outro fez de bom nesta semana?</div>'}
+    <button class="btn btn-ghost btn-sm" style="margin-top:10px" onclick="newRecognition()">+ Reconhecer algo</button></div>`;
+  return html;
+}
+function signals(M, last){
+  const out=[];
+  const sig=(c,ic,t,p)=>out.push(`<div class="signal ${c}"><span class="ic">${ic}</span><div><b>${t}</b><p>${p}</p></div></div>`);
+  const moods=[last.entries.p0.mood,last.entries.p1.mood];
+  if(moods.includes(1)) sig('alert','🌧️','Alguém chegou em crise nesta semana','Antes de olhar números, acolham. Combinem uma conversa curta, sem resolver tudo de uma vez.');
+  M.dims.filter(d=>d.mean<=2).slice(0,3).forEach(d=>sig('alert','●',`${d.name} está baixa para os dois`,'Escolham uma ação pequena e concreta para os próximos 7 dias.'));
+  M.dims.filter(d=>d.gap>=2).slice(0,3).forEach(d=>sig('warn','↔',`${d.name}: diferença de percepção de ${d.gap} pontos`,'Existe uma diferença importante nesta área. Conversem para entender o motivo — sem decidir quem está certo.'));
+  const unresolved=S.conflicts.filter(c=>!c.repairedAt);
+  if(unresolved.length) sig('warn','⟲',`${unresolved.length} conflito${unresolved.length>1?'s':''} sem reparação`,'Voltar a conversar depois da briga é o que mais protege a relação.');
+  const overdue=S.actions.filter(a=>a.status!=='done'&&a.due&&a.due<todayISO());
+  if(overdue.length) sig('warn','⏱',`${overdue.length} ação${overdue.length>1?'ões':''} com prazo vencido`,'Revejam juntos: ajustar o prazo também é progresso.');
+  const {pos,neg}=positiveRatio(30);
+  if(neg>0 && pos < neg*5) sig('info','⚖️',`Equilíbrio positivo: ${pos} reconhecimento${pos===1?'':'s'} para ${neg} conflito${neg===1?'':'s'} (30 dias)`,'Casais estáveis costumam ter muito mais momentos positivos do que negativos. Registrem o que funciona.');
+  const lastRec=[...S.recognitions].sort((a,b)=>b.at.localeCompare(a.at))[0];
+  if(!lastRec || daysBetween(lastRec.at, new Date())>7) sig('info','✦','Nenhum reconhecimento há mais de 7 dias','Uma frase de gratidão muda o clima da casa.');
+  if(!out.length) sig('good','✓','Nenhum sinal de alerta nesta semana','Continuem cuidando do que está funcionando.');
+  return out.join('');
+}
+function drawRadar(){
+  const el=$('#radar'); if(!el||!window.Chart) return;
+  const last=completeRounds().slice(-1)[0]; if(!last) return;
+  const M=roundMetrics(last);
+  const ca=css('--a'), cb=css('--b'), grid=css('--line'), txt=css('--muted');
+  charts.push(new Chart(el,{type:'radar',data:{labels:M.dims.map(d=>d.short),datasets:[
+    {label:nameOf('p0'),data:M.dims.map(d=>d.a),borderColor:ca,backgroundColor:ca+'33',pointBackgroundColor:ca,borderWidth:2,pointRadius:3},
+    {label:nameOf('p1'),data:M.dims.map(d=>d.b),borderColor:cb,backgroundColor:cb+'33',pointBackgroundColor:cb,borderWidth:2,pointRadius:3}]},
+    options:{responsive:true,maintainAspectRatio:false,scales:{r:{min:0,max:5,ticks:{stepSize:1,display:false},grid:{color:grid},angleLines:{color:grid},pointLabels:{color:txt,font:{size:11,weight:'600',family:'Inter'}}}},
+    plugins:{legend:{position:'bottom',labels:{color:txt,usePointStyle:true,boxWidth:8,font:{family:'Inter'}}}}}}));
+}
+function safetyCard(){
+  return `<div class="signal alert" style="display:block;margin-top:12px;padding:16px">
+    <b style="font-size:15px">Sua segurança vem antes de qualquer indicador</b>
+    <p style="margin:6px 0 10px">Você sinalizou algo sério nesta semana (visível só para você). Um aplicativo não resolve violência. Se houver risco, procure ajuda agora:</p>
+    <div class="resource"><span>Emergência — Polícia Militar</span><a href="tel:190">190</a></div>
+    <div class="resource"><span>Violência contra crianças e adolescentes — Disque 100 ou Conselho Tutelar</span><a href="tel:100">100</a></div>
+    <div class="resource"><span>Central de Atendimento à Mulher</span><a href="tel:180">180</a></div>
+    <div class="resource"><span>CVV — apoio emocional, 24h</span><a href="tel:188">188</a></div>
+    <p class="tiny" style="margin-top:10px">Quando há agressão, especialistas recomendam primeiro garantir a segurança de todos (especialmente das crianças) e buscar acompanhamento individual antes da terapia de casal.</p>
+  </div>`;
+}
+
+/* ---------- Check-in ---------- */
+function viewCheckin(){
+  const wk=isoWeek(), r=S.rounds[wk];
+  const existing=r&&r.entries&&r.entries[me];
+  if(!draft){
+    if(existing && !sub) {
+      return `<section class="hero"><div class="eyebrow">Semana de ${weekLabel(wk)}</div><h1>Seu check-in está feito</h1><p>Obrigado por separar esse tempo. ${r.entries[other(me)]?'Os dois já responderam — o panorama está no Início.':`As notas aparecem quando ${esc(nameOf(other(me)))} responder.`}</p></section>
+      <div class="card stack"><button class="btn btn-primary btn-block" onclick="go('home')">Ver o Início</button>
+      <button class="btn btn-ghost btn-block" onclick="startDraft(true)">Revisar minhas respostas</button></div>
+      ${Object.values(existing.safety||{}).includes(true)?safetyCard():''}`;
+    }
+    startDraft(false, true);
+  }
+  return checkinStep();
+}
+function startDraft(edit, silent){
+  const wk=isoWeek(), r=S.rounds[wk], ex=r&&r.entries&&r.entries[me];
+  draft = edit&&ex ? JSON.parse(JSON.stringify(ex)) : {mood:null,factors:[],scores:{},notes:{},safety:{},understand:'',recognize:'',at:null};
+  draft.step = 0;
+  if(!silent) render();
+}
+const STEPS=['Como você chega','Áreas da relação','Segurança','Mensagens'];
+function checkinStep(){
+  const st=draft.step;
+  let body='';
+  if(st===0){
+    body=`<h2>Como você está chegando nesta semana?</h2>
+    <div class="moods">${MOODS.map(m=>`<button class="mood ${draft.mood===m.id?'on':''}" onclick="draft.mood=${m.id};render()"><span class="e">${m.e}</span>${m.t}</button>`).join('')}</div>
+    <label class="f" style="margin-top:22px">O que mais influenciou isso? <span class="muted" style="font-weight:400">(uma ou mais)</span></label>
+    <div class="chips">${FACTORS.map(f=>`<button class="chip ${draft.factors.includes(f)?'on':''}" onclick="toggleFactor('${f}')">${f}</button>`).join('')}</div>`;
+  }
+  if(st===1){
+    body=`<h2>Como cada área esteve nesta semana?</h2><p class="small muted" style="margin-top:4px">Responda pelo que você viveu, não pelo que acha que o outro vai responder.</p>
+    ${DIMS.map((d,i)=>`<div class="card flat" style="margin-top:12px">
+      <div class="row between"><h3>${i+1}. ${d.name}</h3><span class="tiny muted">${draft.scores[d.id]?SCALE_LABELS[draft.scores[d.id]]:''}</span></div>
+      <p class="small muted" style="margin-top:4px">${d.desc}</p>
+      <ul class="hints">${d.hints.map(h=>`<li>${h}</li>`).join('')}</ul>
+      <div class="scale">${[1,2,3,4,5].map(n=>`<button class="${draft.scores[d.id]===n?'on':''}" onclick="setScore('${d.id}',${n})">${n}</button>`).join('')}</div>
+      <div class="scale-legend"><span>Muito difícil</span><span>Muito bem</span></div>
+      <textarea class="in" style="min-height:52px;margin-top:10px;font-size:15px" placeholder="Comentário (opcional, o outro verá)" oninput="draft.notes['${d.id}']=this.value">${esc(draft.notes[d.id]||'')}</textarea>
+    </div>`).join('')}`;
+  }
+  if(st===2){
+    body=`<h2>Segurança</h2><p class="small muted" style="margin-top:4px">🔒 Estas respostas são <b>só suas</b>. O outro não vê. Elas servem para o ELO te mostrar ajuda, se precisar.</p>
+    ${SAFETY_Q.map(q=>`<div class="card flat" style="margin-top:12px"><p class="small" style="font-weight:600">${q.q}</p>
+      <div class="yn"><button class="y ${draft.safety[q.id]===true?'on':''}" onclick="draft.safety['${q.id}']=true;render()">Sim</button><button class="n ${draft.safety[q.id]===false?'on':''}" onclick="draft.safety['${q.id}']=false;render()">Não</button></div></div>`).join('')}`;
+  }
+  if(st===3){
+    body=`<h2>Duas mensagens</h2>
+    <label class="f">O que você gostaria que ${esc(nameOf(other(me)))} entendesse nesta semana?</label>
+    <textarea class="in" placeholder="Fale de você: “eu me senti…”, “eu preciso de…”" oninput="draft.understand=this.value">${esc(draft.understand)}</textarea>
+    <p class="tiny muted" style="margin-top:6px">Dica: frases que começam com “eu” são ouvidas; frases com “você sempre/nunca” viram defesa.</p>
+    <label class="f">Uma coisa que você reconhece e valoriza em ${esc(nameOf(other(me)))}</label>
+    <textarea class="in" placeholder="Algo concreto desta semana, por menor que seja" oninput="draft.recognize=this.value">${esc(draft.recognize)}</textarea>
+    <p class="tiny muted" style="margin-top:6px">O reconhecimento também vai para o mural de reconhecimentos.</p>`;
+  }
+  const canNext = st===0 ? !!draft.mood : st===1 ? DIMS.every(d=>draft.scores[d.id]) : st===2 ? SAFETY_Q.every(q=>typeof draft.safety[q.id]==='boolean') : true;
+  return `<section class="hero" style="padding-bottom:0"><div class="row between"><span class="eyebrow">Passo ${st+1} de ${STEPS.length} · ${STEPS[st]}</span>${st>0?`<button class="tiny muted" onclick="draft.step--;render();scrollTo(0,0)">‹ Voltar</button>`:''}</div>
+    <div class="progress"><i style="width:${(st+1)/STEPS.length*100}%"></i></div></section>
+    ${body}
+    <div style="margin:22px 0">${st<STEPS.length-1
+      ? `<button class="btn btn-primary btn-block" ${canNext?'':'disabled'} onclick="draft.step++;render();scrollTo(0,0)">Continuar</button>
+         ${st===1&&!canNext?`<p class="tiny muted" style="text-align:center;margin-top:8px">Faltam ${DIMS.filter(d=>!draft.scores[d.id]).length} áreas</p>`:''}`
+      : `<button class="btn btn-primary btn-block" onclick="submitCheckin()">Enviar meu check-in</button>`}
+      <button class="btn btn-block" style="margin-top:6px;color:var(--muted)" onclick="draft=null;go('home')">Cancelar</button></div>`;
+}
+function toggleFactor(f){ const i=draft.factors.indexOf(f); i>=0?draft.factors.splice(i,1):draft.factors.push(f); render(); }
+function setScore(id,n){
+  draft.scores[id]=n;
+  const y=window.scrollY; render(); window.scrollTo(0,y);
+}
+function submitCheckin(){
+  const wk=isoWeek();
+  if(!S.rounds[wk]) S.rounds[wk]={id:wk,week:wk,entries:{}};
+  const {step,...entry}=draft;
+  const wasNew=!S.rounds[wk].entries[me];
+  entry.at=new Date().toISOString();
+  S.rounds[wk].entries[me]=entry;
+  if(entry.recognize && entry.recognize.trim() && (wasNew || !S.recognitions.some(r=>r.week===wk&&r.from===me))){
+    S.recognitions.push({id:uid(),from:me,text:entry.recognize.trim(),at:entry.at,week:wk});
+  }
+  save(); draft=null; sub=null;
+  toast('Check-in salvo ✓'); go('checkin');
+}
+
+/* ---------- Evolução ---------- */
+function viewEvolucao(){
+  const rs=completeRounds();
+  let html=`<section class="hero"><div class="eyebrow">Histórico</div><h1>Estamos melhorando?</h1><p>Tendências valem mais do que uma semana isolada.</p></section>`;
+  if(rs.length<1) return html+`<div class="card flat empty">O histórico começa a aparecer depois da primeira semana com os dois check-ins completos.</div>`;
+  html+=`<div class="seg" style="margin-top:8px">${[[4,'4 semanas'],[13,'3 meses'],[26,'6 meses'],[999,'Tudo']].map(([n,t])=>`<button class="${histPeriod===n?'on':''}" onclick="histPeriod=${n};render()">${t}</button>`).join('')}</div>
+  <div class="card"><div class="card-h"><h3>Evolução</h3>
+    <select class="in" style="width:auto;padding:6px 10px;font-size:13px" onchange="histDim=this.value;render()">
+      <option value="all" ${histDim==='all'?'selected':''}>Clima geral</option>
+      ${DIMS.map(d=>`<option value="${d.id}" ${histDim===d.id?'selected':''}>${d.short}</option>`).join('')}
+    </select></div>
+    <div class="chart-box" style="height:240px"><canvas id="hist"></canvas></div></div>`;
+  html+=`<div class="card"><div class="card-h"><h3>Tendência por área</h3><span class="tiny muted">últimas 4 semanas</span></div>
+    ${DIMS.map(d=>{ const t=trendFor(d.id,4); const vals=rs.slice(-4).map(r=>roundMetrics(r).dims.find(x=>x.id===d.id).mean);
+      return `<div class="list-item row between"><div><b class="small">${d.name}</b><div class="tiny muted">${vals.map(fmt1).join(' → ')}</div></div><span class="pill ${t.cls}">${t.label}</span></div>`; }).join('')}
+  </div>`;
+  html+=`<div class="card"><div class="card-h"><h3>Como cada um chegou</h3></div>
+    ${rs.slice(-8).reverse().map(r=>`<div class="list-item row between"><span class="small">${weekLabel(r.week)}</span><span>${['p0','p1'].map(p=>`<span class="pill ${cls(p)}" title="${esc(nameOf(p))}">${MOODS.find(m=>m.id===r.entries[p].mood)?.e||'·'} ${esc(initial(p))}</span>`).join(' ')}</span></div>`).join('')}
+  </div>`;
+  return html;
+}
+function drawHistory(){
+  const el=$('#hist'); if(!el||!window.Chart) return;
+  const rs=completeRounds().slice(-histPeriod);
+  const pick=(r,p)=> histDim==='all' ? avg(DIMS.map(d=>r.entries[p].scores[d.id])) : r.entries[p].scores[histDim];
+  const ca=css('--a'), cb=css('--b'), grid=css('--line'), txt=css('--muted');
+  charts.push(new Chart(el,{type:'line',data:{labels:rs.map(r=>weekLabel(r.week).split(' – ')[0]),datasets:[
+    {label:nameOf('p0'),data:rs.map(r=>pick(r,'p0')),borderColor:ca,backgroundColor:ca,tension:.35,borderWidth:2.5,pointRadius:3},
+    {label:nameOf('p1'),data:rs.map(r=>pick(r,'p1')),borderColor:cb,backgroundColor:cb,tension:.35,borderWidth:2.5,pointRadius:3}]},
+    options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},
+      scales:{y:{min:1,max:5,ticks:{stepSize:1,color:txt},grid:{color:grid}},x:{ticks:{color:txt},grid:{display:false}}},
+      plugins:{legend:{position:'bottom',labels:{color:txt,usePointStyle:true,boxWidth:8,font:{family:'Inter'}}},
+        tooltip:{callbacks:{label:c=>`${c.dataset.label}: ${fmt1(c.parsed.y)}`}}}}}));
+}
+
+/* ---------- Ações ---------- */
+const STATUS={todo:'Não iniciada',doing:'Em andamento',done:'Concluída'};
+function viewAcoes(){
+  const open=S.actions.filter(a=>a.status!=='done'), done=S.actions.filter(a=>a.status==='done');
+  return `<section class="hero"><div class="eyebrow">Planos de ação</div><h1>Pequenas atitudes, toda semana</h1><p>Uma ação boa é concreta, curta e possível. “20 minutos sem celular, 3 vezes” funciona melhor do que “conversar mais”.</p></section>
+  <button class="btn btn-primary btn-block" onclick="newAction()">+ Nova ação</button>
+  <div class="card"><div class="card-h"><h3>Abertas</h3><span class="pill">${open.length}</span></div>${open.length?open.map(a=>actionRow(a,true)).join(''):'<div class="empty">Nenhuma ação aberta.</div>'}</div>
+  ${done.length?`<div class="card"><div class="card-h"><h3>Concluídas</h3><span class="pill good">${done.length}</span></div>${done.slice().reverse().map(a=>actionRow(a,true)).join('')}</div>`:''}`;
+}
+function actionRow(a, full){
+  const dim=DIMS.find(d=>d.id===a.dim);
+  const who=a.owner==='both'?'Ambos':nameOf(a.owner);
+  const late=a.status!=='done'&&a.due&&a.due<todayISO();
+  return `<div class="list-item">
+    <div class="row between"><span class="eyebrow">${esc(dim?dim.short:'Geral')}</span><span class="pill ${a.status==='done'?'good':late?'alert':a.status==='doing'?'a':''}">${late?'Atrasada':STATUS[a.status]}</span></div>
+    <div style="font-weight:600;margin-top:4px">${esc(a.action)}</div>
+    ${full&&a.goal?`<div class="small muted">Objetivo: ${esc(a.goal)}</div>`:''}
+    ${full&&a.problem?`<div class="small muted">Percebido: ${esc(a.problem)}</div>`:''}
+    <div class="tiny muted" style="margin-top:4px">${esc(who)}${a.due?` · até ${fmtDate(a.due)}`:''}${a.doneAt?` · concluída em ${fmtDate(a.doneAt)}`:''}</div>
+    ${full?`<div class="row" style="margin-top:10px;flex-wrap:wrap">
+      ${a.status!=='doing'&&a.status!=='done'?`<button class="btn btn-ghost btn-sm" onclick="setStatus('${a.id}','doing')">Começar</button>`:''}
+      ${a.status!=='done'?`<button class="btn btn-ghost btn-sm" onclick="setStatus('${a.id}','done')">Concluir ✓</button>`:`<button class="btn btn-ghost btn-sm" onclick="setStatus('${a.id}','doing')">Reabrir</button>`}
+      <button class="btn btn-sm" style="color:var(--muted)" onclick="delAction('${a.id}')">Excluir</button></div>`:''}
+  </div>`;
+}
+function newAction(dimId){
+  modal(`<h2>Nova ação</h2>
+    <label class="f">Área</label><select class="in" id="a-dim"><option value="">Geral</option>${DIMS.map(d=>`<option value="${d.id}" ${d.id===dimId?'selected':''}>${d.name}</option>`).join('')}</select>
+    <label class="f">O que percebemos</label><input class="in" id="a-prob" placeholder="Ex.: conversamos pouco e terminamos reclamando">
+    <label class="f">Objetivo</label><input class="in" id="a-goal" placeholder="Ex.: conversas mais leves">
+    <label class="f">Ação concreta</label><input class="in" id="a-act" placeholder="Ex.: 20 min sem celular, 3x na semana">
+    <label class="f">Responsável</label><select class="in" id="a-own"><option value="both">Ambos</option><option value="p0">${esc(nameOf('p0'))}</option><option value="p1">${esc(nameOf('p1'))}</option></select>
+    <label class="f">Prazo</label><input class="in" type="date" id="a-due" value="${new Date(Date.now()+7*864e5).toISOString().slice(0,10)}">
+    <button class="btn btn-primary btn-block" style="margin-top:18px" onclick="saveAction()">Salvar ação</button>`);
+}
+function saveAction(){
+  const act=$('#a-act').value.trim(); if(!act) return toast('Descreva a ação');
+  S.actions.push({id:uid(),dim:$('#a-dim').value,problem:$('#a-prob').value.trim(),goal:$('#a-goal').value.trim(),action:act,owner:$('#a-own').value,due:$('#a-due').value,status:'todo',createdAt:new Date().toISOString(),createdBy:me,doneAt:null});
+  save(); closeModal(); toast('Ação criada'); render();
+}
+function setStatus(id,st){ const a=S.actions.find(x=>x.id===id); a.status=st; a.doneAt=st==='done'?todayISO():null; save(); render(); }
+function delAction(id){ if(!confirm('Excluir esta ação?')) return; S.actions=S.actions.filter(a=>a.id!==id); save(); render(); }
+
+/* ---------- Mais ---------- */
+function viewMais(){
+  if(sub==='reconhecimentos') return viewRecs();
+  if(sub==='conflitos') return viewConflicts();
+  if(sub==='ritual') return viewRitual();
+  if(sub==='privado') return viewPrivate();
+  if(sub==='config') return viewConfig();
+  if(sub==='ajuda') return `<button class="back" onclick="go('mais')">‹ Mais</button><section class="hero"><h1>Ajuda profissional</h1><p>Um painel ajuda a enxergar; não substitui cuidado especializado.</p></section>${safetyCard()}
+    <div class="card"><h3>Terapia de casal</h3><p class="small muted" style="margin-top:6px">Quando a mesma briga se repete, quando há feridas de confiança (como uma traição) ou quando se fala em separação, um terapeuta de casal dá o espaço neutro que um aplicativo não dá. Clínicas-escola de psicologia das universidades costumam oferecer atendimento a preço social.</p></div>
+    <div class="card"><h3>Para as crianças</h3><p class="small muted" style="margin-top:6px">Crianças sentem o clima da casa mesmo quando não entendem as palavras. Evitem discutir na frente delas, nunca as coloquem como mensageiras e reforcem que elas não têm culpa pelos conflitos dos adultos.</p></div>`;
+  const items=[
+    ['reconhecimentos','✦','Reconhecimentos','O mural do que está funcionando'],
+    ['conflitos','⟲','Conflitos e reparação','Registrar, pausar e voltar a conversar'],
+    ['ritual','☕','Ritual semanal','Roteiro da conversa de 30 minutos'],
+    ['privado','🔒',`Meu espaço`,`Diário privado de ${nameOf(me)}`],
+    ['ajuda','☎','Ajuda profissional','Contatos e orientações'],
+    ['config','⚙','Configurações','Nomes, PIN, backup e sincronização']
+  ];
+  return `<section class="hero"><h1>Mais</h1></section><div class="card menu">${items.map(([id,ic,t,s])=>`<button onclick="go('mais','${id}')"><span class="mi">${ic}</span><span class="mt"><b>${esc(t)}</b><span>${esc(s)}</span></span>›</button>`).join('')}</div>
+  <p class="tiny muted" style="text-align:center;margin:18px 0">ELO ${APP_VERSION} · Não é sobre medir o amor.</p>`;
+}
+function recRow(r){ return `<div class="list-item"><div class="row between"><span class="pill ${cls(r.from)}">${esc(nameOf(r.from))} → ${esc(nameOf(other(r.from)))}</span><span class="tiny muted">${fmtDate(r.at)}</span></div><div class="small" style="margin-top:6px">${esc(r.text)}</div></div>`; }
+function viewRecs(){
+  const {pos,neg}=positiveRatio(30);
+  const list=[...S.recognitions].sort((a,b)=>b.at.localeCompare(a.at));
+  return `<button class="back" onclick="go('mais')">‹ Mais</button><section class="hero"><h1>Reconhecimentos</h1><p>O ELO não é um detector de defeitos. Aqui fica o que cada um percebeu de bom no outro.</p></section>
+  <div class="grid2"><div class="card stat"><div class="eyebrow">Últimos 30 dias</div><div class="v">${pos}</div><div class="s">reconhecimentos</div></div>
+  <div class="card stat"><div class="eyebrow">Equilíbrio</div><div class="v">${neg?(pos/neg).toFixed(1).replace('.',','):'—'}<small>${neg?' : 1':''}</small></div><div class="s">positivos por conflito (meta 5:1)</div></div></div>
+  <button class="btn btn-primary btn-block" onclick="newRecognition()">+ Reconhecer ${esc(nameOf(other(me)))}</button>
+  <div class="card">${list.length?list.map(recRow).join(''):'<div class="empty">Ainda vazio.</div>'}</div>`;
+}
+function newRecognition(){
+  modal(`<h2>Reconhecer ${esc(nameOf(other(me)))}</h2><p class="small muted">Algo concreto que ${esc(nameOf(other(me)))} fez e que você valoriza.</p>
+    <textarea class="in" id="rec-t" style="margin-top:12px" placeholder="Ex.: obrigado por ter buscado as meninas quando eu me atrasei"></textarea>
+    <button class="btn btn-primary btn-block" style="margin-top:14px" onclick="saveRec()">Registrar</button>`);
+}
+function saveRec(){ const t=$('#rec-t').value.trim(); if(!t) return; S.recognitions.push({id:uid(),from:me,text:t,at:new Date().toISOString()}); save(); closeModal(); toast('Reconhecimento registrado ✦'); render(); }
+
+function viewConflicts(){
+  const list=[...S.conflicts].sort((a,b)=>b.date.localeCompare(a.date));
+  const rep=S.conflicts.filter(c=>c.repairedAt);
+  const avgH=avg(rep.map(c=>daysBetween(c.date,c.repairedAt)));
+  return `<button class="back" onclick="go('mais')">‹ Mais</button><section class="hero"><h1>Conflitos e reparação</h1><p>Todo casal briga. O que importa é conseguir voltar. Registrem sem culpados: o tema, e depois o que ajudou a reparar.</p></section>
+  <div class="grid2"><div class="card stat"><div class="eyebrow">Sem reparação</div><div class="v">${S.conflicts.length-rep.length}</div><div class="s">conflitos em aberto</div></div>
+  <div class="card stat"><div class="eyebrow">Tempo até reparar</div><div class="v">${avgH==null?'—':fmt1(avgH)}<small>${avgH==null?'':' dias'}</small></div><div class="s">média</div></div></div>
+  <div class="card stack"><h3>Pausa combinada</h3><p class="small muted">Quando a voz subir: qualquer um pode dizer <b>“pausa”</b>. Os dois param, se afastam por 20 a 30 minutos (o corpo precisa desse tempo para desacelerar) e quem pediu a pausa é quem chama de volta. Nada de sair batendo porta nem de retomar na frente das crianças.</p></div>
+  <button class="btn btn-primary btn-block" onclick="newConflict()">+ Registrar conflito</button>
+  <div class="card">${list.length?list.map(c=>`<div class="list-item">
+    <div class="row between"><b class="small">${esc(c.topic)}</b><span class="pill ${c.repairedAt?'good':'warn'}">${c.repairedAt?'Reparado':'Em aberto'}</span></div>
+    <div class="tiny muted">${fmtDate(c.date)} · intensidade ${['','leve','média','forte'][c.intensity]}${c.pause?' · usamos a pausa':''}${c.kids?' · crianças presentes':''}</div>
+    ${c.learned?`<div class="comment">O que ajudou: ${esc(c.learned)}</div>`:''}
+    ${!c.repairedAt?`<button class="btn btn-ghost btn-sm" style="margin-top:8px" onclick="repair('${c.id}')">Marcar como reparado</button>`:''}
+  </div>`).join(''):'<div class="empty">Nenhum conflito registrado.</div>'}</div>`;
+}
+function newConflict(){
+  modal(`<h2>Registrar conflito</h2><p class="small muted">Descreva o tema, não o culpado.</p>
+    <label class="f">Tema</label><input class="in" id="c-t" placeholder="Ex.: divisão das tarefas no fim de semana">
+    <label class="f">Data</label><input class="in" type="date" id="c-d" value="${todayISO()}">
+    <label class="f">Intensidade</label><div class="seg" id="c-i">${[1,2,3].map(n=>`<button class="${n===2?'on':''}" data-v="${n}" onclick="[...this.parentNode.children].forEach(b=>b.classList.remove('on'));this.classList.add('on')">${['','Leve','Média','Forte'][n]}</button>`).join('')}</div>
+    <label class="check"><input type="checkbox" id="c-p"><span>Conseguimos usar a pausa combinada</span></label>
+    <label class="check"><input type="checkbox" id="c-k"><span>Aconteceu na frente das crianças</span></label>
+    <button class="btn btn-primary btn-block" style="margin-top:10px" onclick="saveConflict()">Registrar</button>`);
+}
+function saveConflict(){
+  const t=$('#c-t').value.trim(); if(!t) return toast('Descreva o tema');
+  S.conflicts.push({id:uid(),topic:t,date:$('#c-d').value||todayISO(),intensity:+document.querySelector('#c-i .on').dataset.v,pause:$('#c-p').checked,kids:$('#c-k').checked,by:me,repairedAt:null,learned:''});
+  save(); closeModal(); render();
+}
+function repair(id){
+  modal(`<h2>Reparação</h2><p class="small muted">O que ajudou vocês a voltarem a conversar?</p>
+    <textarea class="in" id="r-l" style="margin-top:12px" placeholder="Ex.: pedi desculpas pelo tom e ela explicou o que estava sentindo"></textarea>
+    <button class="btn btn-primary btn-block" style="margin-top:14px" onclick="saveRepair('${id}')">Marcar como reparado</button>`);
+}
+function saveRepair(id){ const c=S.conflicts.find(x=>x.id===id); c.repairedAt=todayISO(); c.learned=$('#r-l').value.trim(); save(); closeModal(); toast('Reparação registrada'); render(); }
+
+function viewRitual(){
+  return `<button class="back" onclick="go('mais')">‹ Mais</button><section class="hero"><h1>Ritual semanal</h1><p>30 minutos, uma vez por semana, sem celular e longe das crianças. Não é uma DR — é a reunião do time.</p></section>
+  <div class="card"><ol class="steps">
+    <li><b>Apreciação (5 min).</b> Cada um diz duas coisas que o outro fez bem na semana.</li>
+    <li><b>O que está bem (5 min).</b> Olhem juntos as áreas que subiram ou estão estáveis.</li>
+    <li><b>Uma diferença (10 min).</b> Escolham só <i>um</i> gap de percepção. Um fala, o outro repete com as próprias palavras o que entendeu antes de responder.</li>
+    <li><b>Uma ação (5 min).</b> Criem uma única ação pequena para a próxima semana.</li>
+    <li><b>Fechamento (5 min).</b> Combinem algo bom para fazer juntos até o próximo ritual.</li>
+  </ol></div>
+  <div class="card"><h3>Combinados que protegem a conversa</h3><ul class="hints" style="font-size:14px;margin-top:10px">
+    <li>Falar de si (“eu senti”) em vez de acusar (“você sempre”).</li>
+    <li>Um assunto por vez; o passado entra só se for para reparar.</li>
+    <li>Crítica ao comportamento, nunca à pessoa.</li>
+    <li>Se a voz subir, usar a pausa combinada.</li>
+    <li>Terminar com um toque, um abraço ou um obrigado.</li>
+  </ul></div>`;
+}
+
+function viewPrivate(){
+  const list=(S.private[me]||[]).slice().reverse();
+  return `<button class="back" onclick="go('mais')">‹ Mais</button><section class="hero"><h1>Meu espaço</h1><p>Só ${esc(nameOf(me))} vê o que está aqui. Use para organizar o que sente antes de levar para a conversa.${S.partners[me==='p0'?0:1].pin?'':' <b>Dica:</b> defina um PIN em Configurações para proteger este espaço.'}</p></section>
+  <div class="card"><textarea class="in" id="pv" placeholder="Como estou me sentindo, o que me machucou, o que eu preciso…"></textarea>
+  <button class="btn btn-primary btn-block" style="margin-top:12px" onclick="savePrivate()">Guardar</button></div>
+  <div class="card">${list.length?list.map(e=>`<div class="list-item"><div class="row between"><span class="tiny muted">${fmtDate(e.at)}</span><button class="tiny muted" onclick="delPrivate('${e.id}')">excluir</button></div><div class="small" style="margin-top:4px;white-space:pre-wrap">${esc(e.text)}</div></div>`).join(''):'<div class="empty">Nenhuma anotação.</div>'}</div>`;
+}
+function savePrivate(){ const t=$('#pv').value.trim(); if(!t) return; (S.private[me]=S.private[me]||[]).push({id:uid(),text:t,at:new Date().toISOString()}); save(); render(); }
+function delPrivate(id){ if(!confirm('Excluir esta anotação?')) return; S.private[me]=S.private[me].filter(e=>e.id!==id); save(); render(); }
+
+/* ---------- Configurações, backup e sincronização ---------- */
+function viewConfig(){
+  const i=me==='p0'?0:1;
+  return `<button class="back" onclick="go('mais')">‹ Mais</button><section class="hero"><h1>Configurações</h1></section>
+  <div class="card"><h3>Nomes</h3>
+    <label class="f">Parceiro 1</label><input class="in" id="cfg0" value="${esc(S.partners[0].name)}">
+    <label class="f">Parceiro 2</label><input class="in" id="cfg1" value="${esc(S.partners[1].name)}">
+    <button class="btn btn-ghost btn-block" style="margin-top:12px" onclick="saveNames()">Salvar nomes</button></div>
+  <div class="card"><h3>PIN de ${esc(nameOf(me))}</h3><p class="small muted" style="margin-top:4px">Protege seu espaço privado quando os dois usam o mesmo aparelho.</p>
+    <div class="row" style="margin-top:12px">${S.partners[i].pin?`<button class="btn btn-ghost btn-sm" onclick="setPin()">Trocar PIN</button><button class="btn btn-sm" style="color:var(--muted)" onclick="clearPin()">Remover</button>`:`<button class="btn btn-ghost btn-sm" onclick="setPin()">Definir PIN</button>`}</div></div>
+  <div class="card"><h3>Usar em dois celulares</h3>
+    <p class="small muted" style="margin-top:4px">Nesta versão, cada aparelho guarda seus dados. Para juntar os check-ins: exporte o arquivo de sincronização em um celular e importe no outro (pelo WhatsApp, AirDrop ou e-mail). Anotações de “Meu espaço” nunca vão no arquivo. Com o Supabase, isso passa a ser automático.</p>
+    <div class="stack" style="margin-top:12px">
+      <button class="btn btn-ghost btn-block" onclick="exportData()">Exportar arquivo de sincronização</button>
+      <label class="btn btn-line btn-block">Importar e mesclar<input type="file" accept="application/json,.json" class="hidden" onchange="importData(this)"></label>
+    </div></div>
+  <div class="card"><h3>Apagar dados</h3><p class="small muted" style="margin-top:4px">Remove tudo deste aparelho. Não pode ser desfeito.</p>
+    <button class="btn btn-sm" style="margin-top:10px;color:var(--alert)" onclick="resetAll()">Apagar tudo deste aparelho</button></div>`;
+}
+function saveNames(){ const a=$('#cfg0').value.trim(), b=$('#cfg1').value.trim(); if(!a||!b) return toast('Os nomes não podem ficar vazios'); S.partners[0].name=a; S.partners[1].name=b; save(); toast('Nomes salvos'); render(); }
+function setPin(){
+  modal(`<h2>Novo PIN</h2><p class="small muted">4 dígitos que só você saiba.</p><div class="pin">${[0,1,2,3].map(i=>`<input inputmode="numeric" maxlength="1" type="password">`).join('')}</div>
+    <button class="btn btn-primary btn-block" onclick="savePin()">Salvar PIN</button>`); wirePin();
+}
+async function savePin(){ const v=pinValue(); if(v.length!==4) return toast('Digite os 4 dígitos'); S.partners[me==='p0'?0:1].pin=await sha(v); save(); closeModal(); toast('PIN definido'); render(); }
+function clearPin(){ S.partners[me==='p0'?0:1].pin=null; save(); render(); }
+function exportData(){
+  const {private:_, ...shared}=S;
+  shared.partners=S.partners.map(p=>({name:p.name,pin:null}));
+  // não exportar respostas de segurança (são privadas)
+  shared.rounds=JSON.parse(JSON.stringify(S.rounds));
+  Object.values(shared.rounds).forEach(r=>Object.values(r.entries).forEach(e=>delete e.safety));
+  const blob=new Blob([JSON.stringify({elo:APP_VERSION,exportedAt:new Date().toISOString(),data:shared},null,2)],{type:'application/json'});
+  const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=`elo-sync-${todayISO()}.json`; document.body.appendChild(a); a.click(); a.remove();
+  toast('Arquivo exportado');
+}
+function importData(input){
+  const f=input.files[0]; if(!f) return;
+  const rd=new FileReader();
+  rd.onload=()=>{ try{
+    const d=JSON.parse(rd.result).data; if(!d||!d.rounds) throw 0;
+    Object.values(d.rounds).forEach(r=>{
+      const cur=S.rounds[r.week]||(S.rounds[r.week]={id:r.week,week:r.week,entries:{}});
+      ['p0','p1'].forEach(p=>{ const inc=r.entries[p]; if(!inc) return; const ex=cur.entries[p];
+        if(!ex || (inc.at||'')>(ex.at||'')) cur.entries[p]={...inc, safety: ex?ex.safety:undefined}; });
+    });
+    const mergeArr=(k)=>{ const map=new Map(S[k].map(x=>[x.id,x])); (d[k]||[]).forEach(x=>{ const ex=map.get(x.id); if(!ex) map.set(x.id,x); else if(k==='actions'&&x.status==='done'&&ex.status!=='done') map.set(x.id,x); else if(k==='conflicts'&&x.repairedAt&&!ex.repairedAt) map.set(x.id,x); }); S[k]=[...map.values()]; };
+    ['actions','recognitions','conflicts'].forEach(mergeArr);
+    if(!S.onboarded && d.partners){ S.partners=d.partners.map(p=>({name:p.name,pin:null})); S.onboarded=true; }
+    save(); toast('Dados mesclados ✓'); render();
+  }catch(e){ toast('Arquivo inválido'); } };
+  rd.readAsText(f);
+}
+function resetAll(){ if(!confirm('Apagar todos os dados do ELO deste aparelho?')) return; if(!confirm('Tem certeza? Não dá para desfazer.')) return; try{localStorage.removeItem(STORAGE_KEY);localStorage.removeItem('elo.me');}catch(e){} S=Store.blank(); me=null; view='home'; render(); }
+
+/* ---------- Início ---------- */
+window.matchMedia('(prefers-color-scheme: dark)').addEventListener?.('change',()=>render());
+render();
+</script>
+</body>
+</html>
