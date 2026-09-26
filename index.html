@@ -17,6 +17,8 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script src="config.js"></script>
 <style>
 :root{
   --bg:#F6F3EE; --surface:#FFFFFF; --surface-2:#F0ECE5; --line:#E4DED4;
@@ -178,8 +180,9 @@ textarea.in{min-height:92px;resize:vertical;line-height:1.45}
 <script>
 /* =========================================================================
    ELO — Alinhamento. Cuidado. Evolução.
-   Versão 1 (arquivo único). Os dados ficam no aparelho (localStorage).
-   Camada de armazenamento isolada em Store — trocar por Supabase depois.
+   Arquivo único. Sem Supabase configurado (config.js), os dados ficam no
+   aparelho (localStorage). Com Supabase, cada pessoa entra com a própria
+   conta e os dados do casal sincronizam pela nuvem (ver Cloud).
    ========================================================================= */
 
 const APP_VERSION = '1.0.0';
@@ -263,7 +266,7 @@ async function sha(s){
   catch(e){ return 'plain:'+s; }
 }
 
-/* ---------- Armazenamento (trocar por Supabase no futuro) ---------- */
+/* ---------- Armazenamento ---------- */
 const Store = {
   blank(){
     return { version:APP_VERSION, onboarded:false,
@@ -272,11 +275,130 @@ const Store = {
       private:{p0:[],p1:[]}, createdAt:new Date().toISOString() };
   },
   load(){
+    if(CLOUD) return this.blank();
     try{ const raw = localStorage.getItem(STORAGE_KEY); if(raw) return Object.assign(this.blank(), JSON.parse(raw)); }
     catch(e){}
     return this.blank();
   },
-  save(s){ try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(s)); }catch(e){ toast('Não foi possível salvar neste aparelho'); } }
+  save(s){ if(CLOUD) return Cloud.sync(); try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(s)); }catch(e){ toast('Não foi possível salvar neste aparelho'); } }
+};
+
+/* ---------- Nuvem (Supabase) ----------
+   O estado S continua sendo a fonte da verdade na tela. A cada save(), o
+   Cloud compara S com o último retrato enviado e grava só o que mudou.
+   Regras de privacidade ficam no banco (supabase/schema.sql):
+   - "Meu espaço" e respostas de segurança: só o próprio usuário vê;
+   - check-in do outro: só aparece depois que eu respondi a mesma semana. */
+const CFG = window.ELO_CONFIG || {};
+const CLOUD = !!(CFG.supabaseUrl && CFG.supabaseAnonKey);
+const sb = CLOUD && window.supabase ? window.supabase.createClient(CFG.supabaseUrl, CFG.supabaseAnonKey) : null;
+const Cloud = {
+  status: CLOUD ? 'loading' : 'off',   // loading | auth | couple | ready | error | off
+  error: '', user: null, couple: null, members: [],
+  snap: new Map(), queue: Promise.resolve(),
+
+  async init(){
+    if(!sb){ this.status='error'; this.error='Não foi possível carregar o Supabase. Verifique a internet.'; render(); return; }
+    sb.auth.onAuthStateChange((ev, session) => {
+      // chamadas ao Supabase dentro deste callback podem travar; por isso o setTimeout
+      if(ev==='SIGNED_OUT'){ this.user=null; this.couple=null; this.members=[]; this.snap=new Map(); S=Store.blank(); me=null; view='home'; sub=null; this.status='auth'; render(); }
+      else if(ev==='PASSWORD_RECOVERY') setTimeout(newPasswordModal, 0);
+      else if(session && (!this.user || this.user.id!==session.user.id)){ this.user=session.user; setTimeout(()=>this.refresh(), 0); }
+    });
+    const { data:{ session } } = await sb.auth.getSession();
+    if(session){ if(!this.user){ this.user=session.user; await this.refresh(); } }
+    else { this.status='auth'; render(); }
+  },
+
+  async refresh(){
+    try{ await this.queue; await this.load(); }
+    catch(e){
+      console.error(e);
+      if(this.status==='ready') toast('Sem conexão com a nuvem');
+      else { this.status='error'; this.error=e.message||String(e); }
+    }
+    render();
+  },
+
+  async load(){
+    const uid = this.user.id;
+    const m = await sb.from('members').select('couple_id,user_id,slot');
+    if(m.error) throw m.error;
+    const mine = (m.data||[]).find(x=>x.user_id===uid);
+    if(!mine){ this.status='couple'; return; }
+    const [c, it, pv, ws] = await Promise.all([
+      sb.from('couples').select('*').eq('id', mine.couple_id).single(),
+      sb.from('items').select('kind,id,data').eq('couple_id', mine.couple_id),
+      sb.from('private_items').select('kind,id,data'),
+      sb.rpc('week_status')
+    ]);
+    for(const r of [c,it,pv,ws]) if(r.error) throw r.error;
+    this.couple=c.data; this.members=m.data; me=mine.slot;
+    const T=Store.blank(); T.onboarded=true;
+    T.partners=[{name:c.data.p0_name,pin:null},{name:c.data.p1_name,pin:null}];
+    const round = wk => T.rounds[wk] || (T.rounds[wk]={id:wk,week:wk,entries:{}});
+    // quem já respondeu, mesmo quando as respostas ainda estão ocultas
+    (ws.data||[]).forEach(w=>{ round(w.week).entries[w.slot]={hidden:true,at:w.at}; });
+    (it.data||[]).forEach(x=>{
+      if(x.kind==='entry'){ const [wk,slot]=x.id.split(':'); round(wk).entries[slot]=x.data; }
+      else T[x.kind+'s'].push(x.data);
+    });
+    (pv.data||[]).forEach(x=>{
+      if(x.kind==='note') T.private[me].push(x.data);
+      else if(x.kind==='safety'){ const e=T.rounds[x.id]&&T.rounds[x.id].entries[me]; if(e&&!e.hidden) e.safety=x.data; }
+    });
+    const by = k => (a,b)=>String(a[k]||'').localeCompare(String(b[k]||''));
+    T.actions.sort(by('createdAt')); T.recognitions.sort(by('at')); T.conflicts.sort(by('date')); T.private[me].sort(by('at'));
+    S=T;
+    this.snap=new Map([...this.toItems()].map(([k,v])=>[k,JSON.stringify(v.data)]));
+    this.status='ready';
+  },
+
+  // S → linhas do banco que EU posso gravar
+  toItems(){
+    const out=new Map();
+    const put=(table,kind,id,data)=>out.set(`${table}|${kind}|${id}`,{table,kind,id,data});
+    Object.values(S.rounds).forEach(r=>{
+      const e=r.entries&&r.entries[me]; if(!e||e.hidden) return;
+      const {safety,...pub}=e;
+      put('items','entry',`${r.week}:${me}`,pub);
+      if(safety&&Object.keys(safety).length) put('private_items','safety',r.week,safety);
+    });
+    ['action','recognition','conflict'].forEach(k=>(S[k+'s']||[]).forEach(x=>put('items',k,x.id,x)));
+    (S.private[me]||[]).forEach(n=>put('private_items','note',n.id,n));
+    put('couples','names','names',{p0_name:S.partners[0].name,p1_name:S.partners[1].name});
+    return out;
+  },
+
+  sync(){
+    if(this.status!=='ready') return this.queue;
+    this.queue=this.queue.then(()=>this._sync()).catch(e=>{ console.error(e); toast('Não foi possível salvar na nuvem. Verifique a conexão.'); });
+    return this.queue;
+  },
+
+  async _sync(){
+    const cid=this.couple.id, uid=this.user.id, cur=this.toItems();
+    const items=[], priv=[], done=[]; let names=null;
+    cur.forEach((v,k)=>{
+      const j=JSON.stringify(v.data); if(this.snap.get(k)===j) return;
+      if(v.table==='couples') names=v.data;
+      else if(v.table==='items') items.push({couple_id:cid,kind:v.kind,id:v.id,data:v.data});
+      else priv.push({user_id:uid,kind:v.kind,id:v.id,data:v.data});
+      done.push([k,j]);
+    });
+    const gone=[...this.snap.keys()].filter(k=>!cur.has(k));
+    const ok=r=>{ if(r.error) throw r.error; };
+    if(names) ok(await sb.from('couples').update(names).eq('id',cid));
+    if(items.length) ok(await sb.from('items').upsert(items,{onConflict:'couple_id,kind,id'}));
+    if(priv.length) ok(await sb.from('private_items').upsert(priv,{onConflict:'user_id,kind,id'}));
+    for(const k of gone){
+      const [table,kind,id]=k.split('|');
+      if(table==='items') ok(await sb.from('items').delete().match({couple_id:cid,kind,id}));
+      else if(table==='private_items') ok(await sb.from('private_items').delete().match({user_id:uid,kind,id}));
+    }
+    done.forEach(([k,j])=>this.snap.set(k,j));
+    gone.forEach(k=>this.snap.delete(k));
+  }
 };
 let S = Store.load();
 let me = null;                // 'p0' | 'p1'
@@ -285,7 +407,7 @@ let sub = null;               // subpágina da aba "Mais"
 let draft = null;             // rascunho do check-in
 let charts = [];
 let histPeriod = 4, histDim = 'all';
-try{ const last = localStorage.getItem('elo.me'); if(last==='p0'||last==='p1') me = last; }catch(e){}
+if(!CLOUD){ try{ const last = localStorage.getItem('elo.me'); if(last==='p0'||last==='p1') me = last; }catch(e){} }
 
 const save = () => Store.save(S);
 const other = p => p==='p0' ? 'p1' : 'p0';
@@ -295,7 +417,7 @@ const initial = p => (nameOf(p)[0]||'?').toUpperCase();
 
 /* ---------- Cálculos ---------- */
 function roundsSorted(){ return Object.values(S.rounds).sort((a,b)=>a.week.localeCompare(b.week)); }
-function isComplete(r){ return r && r.entries && r.entries.p0 && r.entries.p1; }
+function isComplete(r){ return r && r.entries && r.entries.p0 && r.entries.p1 && !r.entries.p0.hidden && !r.entries.p1.hidden; }
 function completeRounds(){ return roundsSorted().filter(isComplete); }
 function scoreOf(entry, dim){ return entry && entry.scores ? entry.scores[dim] : null; }
 function roundMetrics(r){
@@ -368,6 +490,7 @@ function go(v, s=null){ view=v; sub=s; render(); window.scrollTo(0,0); }
 function render(){
   destroyCharts();
   const app = $('#app');
+  if(CLOUD && Cloud.status!=='ready'){ app.innerHTML = viewCloud(); return; }
   if(!S.onboarded){ app.innerHTML = viewOnboarding(); return; }
   if(!me){ app.innerHTML = viewPickUser(); return; }
   const V = {home:viewHome, checkin:viewCheckin, evolucao:viewEvolucao, acoes:viewAcoes, mais:viewMais}[view] || viewHome;
@@ -413,6 +536,127 @@ function finishOnboarding(){
   setMe('p0'); render();
 }
 
+
+/* ---------- Nuvem: login e casal ---------- */
+const LOGO_BIG = `<svg class="logo-big" viewBox="0 0 68 44"><circle cx="24" cy="22" r="16" fill="none" stroke="var(--a)" stroke-width="4"/><circle cx="44" cy="22" r="16" fill="none" stroke="var(--b)" stroke-width="4"/></svg>`;
+function viewCloud(){
+  if(Cloud.status==='loading') return `<div class="wrap onb view">${LOGO_BIG}<p class="muted" style="text-align:center">Carregando…</p></div>`;
+  if(Cloud.status==='error') return `<div class="wrap onb view">${LOGO_BIG}<h1>Não foi possível conectar</h1>
+    <p class="small muted" style="margin-top:8px">${esc(Cloud.error)}</p>
+    <button class="btn btn-primary btn-block" style="margin-top:18px" onclick="Cloud.status='loading';render();Cloud.user?Cloud.refresh():Cloud.init()">Tentar de novo</button>
+    ${Cloud.user?`<button class="btn btn-block" style="margin-top:6px;color:var(--muted)" onclick="sb.auth.signOut()">Sair da conta</button>`:''}</div>`;
+  if(Cloud.status==='auth') return viewLogin();
+  if(Cloud.status==='couple') return viewCouple();
+  return '';
+}
+function viewLogin(){
+  return `<div class="wrap onb view">${LOGO_BIG}
+    <div class="eyebrow">Alinhamento · Cuidado · Evolução</div>
+    <h1 style="margin-top:8px">Entre na sua conta</h1>
+    <p class="small muted" style="margin-top:6px">Cada um usa a própria conta, no próprio celular. Seus check-ins, seu espaço privado e suas respostas de segurança ficam protegidos.</p>
+    <label class="f">E-mail</label><input class="in" id="li-e" type="email" autocomplete="email" inputmode="email">
+    <label class="f">Senha</label><input class="in" id="li-p" type="password" autocomplete="current-password" placeholder="Mínimo 6 caracteres">
+    <div class="stack" style="margin-top:16px">
+      <button class="btn btn-primary btn-block" onclick="cloudLogin(false)">Entrar</button>
+      <button class="btn btn-line btn-block" onclick="cloudLogin(true)">Criar conta</button>
+    </div>
+    <button class="tiny muted" style="display:block;margin:14px auto 0" onclick="cloudForgot()">Esqueci minha senha</button>
+  </div>`;
+}
+const AUTH_ERR = {
+  'Invalid login credentials':'E-mail ou senha incorretos',
+  'Email not confirmed':'Confirme seu e-mail pelo link que enviamos',
+  'User already registered':'Este e-mail já tem conta. Use “Entrar”.'
+};
+const authMsg = e => AUTH_ERR[e.message] || e.message || 'Algo deu errado';
+const appUrl = () => location.origin + location.pathname;
+async function cloudLogin(signup){
+  const email=$('#li-e').value.trim(), password=$('#li-p').value;
+  if(!email || password.length<6) return toast('Informe e-mail e senha (mínimo 6 caracteres)');
+  const r = signup
+    ? await sb.auth.signUp({email, password, options:{emailRedirectTo:appUrl()}})
+    : await sb.auth.signInWithPassword({email, password});
+  if(r.error) return toast(authMsg(r.error));
+  if(signup && !r.data.session) modal(`<h2>Confirme seu e-mail</h2><p class="small muted" style="margin-top:6px">Enviamos um link para <b>${esc(email)}</b>. Abra o link neste aparelho para ativar a conta e depois volte aqui.</p><button class="btn btn-primary btn-block" style="margin-top:14px" onclick="closeModal()">Ok</button>`);
+}
+async function cloudForgot(){
+  const email=$('#li-e').value.trim(); if(!email) return toast('Digite seu e-mail acima');
+  const {error}=await sb.auth.resetPasswordForEmail(email,{redirectTo:appUrl()});
+  if(error) return toast(authMsg(error));
+  toast('Enviamos um link para redefinir a senha');
+}
+function newPasswordModal(){
+  modal(`<h2>Nova senha</h2><input class="in" id="np" type="password" autocomplete="new-password" placeholder="Mínimo 6 caracteres" style="margin-top:12px">
+    <button class="btn btn-primary btn-block" style="margin-top:14px" onclick="saveNewPassword()">Salvar senha</button>`);
+}
+async function saveNewPassword(){
+  const password=$('#np').value; if(password.length<6) return toast('Mínimo 6 caracteres');
+  const {error}=await sb.auth.updateUser({password}); if(error) return toast(authMsg(error));
+  closeModal(); toast('Senha alterada ✓');
+}
+function localData(){
+  try{ const L=JSON.parse(localStorage.getItem(STORAGE_KEY)||'null'); return L&&L.onboarded?L:null; }catch(e){ return null; }
+}
+function viewCouple(){
+  const L=localData();
+  return `<div class="wrap onb view">${LOGO_BIG}
+    <h1>Vamos conectar vocês dois</h1>
+    <p class="small muted" style="margin-top:6px">Conectado como ${esc(Cloud.user&&Cloud.user.email)}.</p>
+    <div class="card"><h3>O outro já criou o casal?</h3>
+      <p class="small muted" style="margin-top:4px">Peça o código de convite (fica em Mais → Configurações no celular dele(a)).</p>
+      <input class="in" id="jc" placeholder="Código de convite" autocapitalize="characters" style="margin-top:12px;text-transform:uppercase;letter-spacing:.15em">
+      <button class="btn btn-primary btn-block" style="margin-top:12px" onclick="cloudJoin()">Entrar no casal</button></div>
+    <div class="card"><h3>Ou comece um casal novo</h3>
+      <div class="rule" style="margin-top:10px"><p class="small muted">O ELO não é uma arma. Ele não serve para provar quem está certo, cobrar o outro ou vencer uma discussão. Ele mostra onde o relacionamento precisa de atenção — para que vocês dois cuidem disso como equipe.</p></div>
+      <label class="f">Seu nome</label><input class="in" id="n0" autocomplete="given-name" value="${L?esc(L.partners[0].name):''}">
+      <label class="f">Nome do(a) parceiro(a)</label><input class="in" id="n1" value="${L?esc(L.partners[1].name):''}">
+      <label class="check"><input type="checkbox" id="agree"><span>Concordamos em usar o ELO com honestidade, sem usar as respostas do outro como munição.</span></label>
+      ${L?`<label class="check"><input type="checkbox" id="mig" checked><span>Levar para a nuvem o que já foi registrado neste aparelho (check-ins de ${esc(L.partners[0].name)}, ações, reconhecimentos, conflitos e o espaço privado de ${esc(L.partners[0].name)}).</span></label>`:''}
+      <button class="btn btn-ghost btn-block" onclick="cloudCreate()">Criar casal</button></div>
+    <button class="btn btn-block" style="color:var(--muted)" onclick="sb.auth.signOut()">Sair da conta</button>
+  </div>`;
+}
+async function cloudCreate(){
+  const a=$('#n0').value.trim(), b=$('#n1').value.trim();
+  if(!a||!b) return toast('Preencha os dois nomes');
+  if(!$('#agree').checked) return toast('Marque o acordo para continuar');
+  const mig=$('#mig')&&$('#mig').checked ? localData() : null;
+  const {error}=await sb.rpc('create_couple',{my_name:a, partner_name:b});
+  if(error) return toast(error.message);
+  await Cloud.refresh();
+  if(mig && Cloud.status==='ready'){
+    Object.values(mig.rounds||{}).forEach(r=>{ const e=r.entries&&r.entries.p0; if(!e) return;
+      (S.rounds[r.week]||(S.rounds[r.week]={id:r.week,week:r.week,entries:{}})).entries.p0=e; });
+    ['actions','recognitions','conflicts'].forEach(k=>S[k].push(...(mig[k]||[])));
+    S.private.p0.push(...((mig.private&&mig.private.p0)||[]));
+    await save(); toast('Dados deste aparelho enviados ✓'); render();
+  }
+}
+async function cloudJoin(){
+  const code=$('#jc').value.trim(); if(!code) return toast('Digite o código');
+  const {error}=await sb.rpc('join_couple',{code});
+  if(error) return toast(error.message);
+  await Cloud.refresh();
+}
+function inviteCard(){
+  if(!CLOUD || Cloud.members.length>1) return '';
+  return `<div class="card"><h3>Convide ${esc(nameOf(other(me)))}</h3>
+    <p class="small muted" style="margin-top:4px">Peça para criar uma conta no ELO e usar este código em “Entrar no casal”:</p>
+    <p style="font-size:26px;font-weight:700;letter-spacing:.2em;text-align:center;margin:12px 0">${esc(Cloud.couple.invite_code)}</p>
+    <button class="btn btn-ghost btn-block" onclick="shareInvite()">Compartilhar convite</button></div>`;
+}
+function shareInvite(){
+  const text=`Entre no nosso ELO: ${appUrl()} — crie sua conta e use o código ${Cloud.couple.invite_code}`;
+  if(navigator.share) navigator.share({text}).catch(()=>{});
+  else navigator.clipboard.writeText(text).then(()=>toast('Convite copiado'),()=>toast(text));
+}
+document.addEventListener('visibilitychange',()=>{
+  // ao voltar para o app, busca o que o outro registrou (sem atrapalhar quem está digitando)
+  if(document.visibilityState!=='visible' || Cloud.status!=='ready' || $('#modal')) return;
+  if(/INPUT|TEXTAREA|SELECT/.test((document.activeElement&&document.activeElement.tagName)||'')) return;
+  Cloud.refresh();
+});
+
 /* ---------- Troca de usuário / PIN ---------- */
 function setMe(p){ me=p; try{ localStorage.setItem('elo.me',p); }catch(e){} }
 function viewPickUser(){
@@ -428,6 +672,9 @@ function viewPickUser(){
     </div></div>`;
 }
 function switchUser(){
+  if(CLOUD) return modal(`<h2>${esc(nameOf(me))}</h2><p class="small muted" style="margin:4px 0 14px">Conectado como ${esc(Cloud.user.email)}</p>
+    <div class="stack"><button class="btn btn-line btn-block" onclick="closeModal();Cloud.refresh()">Atualizar dados</button>
+    <button class="btn btn-line btn-block" onclick="closeModal();sb.auth.signOut()">Sair da conta</button></div>`);
   modal(`<h2>Trocar de pessoa</h2><p class="small muted" style="margin:4px 0 14px">Quem vai usar o ELO agora?</p>
     <div class="stack">${['p0','p1'].map(p=>`<button class="btn btn-line btn-block" style="justify-content:flex-start" onclick="closeModal();pickUser('${p}')"><span class="avatar av-${cls(p)}">${esc(initial(p))}</span>${esc(nameOf(p))}${p===me?' · atual':''}</button>`).join('')}</div>`);
 }
@@ -460,7 +707,7 @@ function viewHome(){
   const done = completeRounds();
   const last = done[done.length-1];
   const prev = done[done.length-2];
-  let html = `<section class="hero"><div class="eyebrow">Semana de ${weekLabel(wk)}</div><h1>Como está o nosso relacionamento?</h1></section>`;
+  let html = `<section class="hero"><div class="eyebrow">Semana de ${weekLabel(wk)}</div><h1>Como está o nosso relacionamento?</h1></section>${inviteCard()}`;
 
   // Status da semana
   html += `<div class="card"><div class="card-h"><h3>Check-in desta semana</h3>${mineDone&&theirsDone?'<span class="pill good">Completo</span>':'<span class="pill">Em aberto</span>'}</div>
@@ -662,6 +909,7 @@ function submitCheckin(){
   }
   save(); draft=null; sub=null;
   toast('Check-in salvo ✓'); go('checkin');
+  if(CLOUD) Cloud.queue.then(()=>Cloud.refresh());
 }
 
 /* ---------- Evolução ---------- */
@@ -758,7 +1006,7 @@ function viewMais(){
     ['ritual','☕','Ritual semanal','Roteiro da conversa de 30 minutos'],
     ['privado','🔒',`Meu espaço`,`Diário privado de ${nameOf(me)}`],
     ['ajuda','☎','Ajuda profissional','Contatos e orientações'],
-    ['config','⚙','Configurações','Nomes, PIN, backup e sincronização']
+    ['config','⚙','Configurações',CLOUD?'Nomes, convite, conta e backup':'Nomes, PIN, backup e sincronização']
   ];
   return `<section class="hero"><h1>Mais</h1></section><div class="card menu">${items.map(([id,ic,t,s])=>`<button onclick="go('mais','${id}')"><span class="mi">${ic}</span><span class="mt"><b>${esc(t)}</b><span>${esc(s)}</span></span>›</button>`).join('')}</div>
   <p class="tiny muted" style="text-align:center;margin:18px 0">ELO ${APP_VERSION} · Não é sobre medir o amor.</p>`;
@@ -837,7 +1085,7 @@ function viewRitual(){
 
 function viewPrivate(){
   const list=(S.private[me]||[]).slice().reverse();
-  return `<button class="back" onclick="go('mais')">‹ Mais</button><section class="hero"><h1>Meu espaço</h1><p>Só ${esc(nameOf(me))} vê o que está aqui. Use para organizar o que sente antes de levar para a conversa.${S.partners[me==='p0'?0:1].pin?'':' <b>Dica:</b> defina um PIN em Configurações para proteger este espaço.'}</p></section>
+  return `<button class="back" onclick="go('mais')">‹ Mais</button><section class="hero"><h1>Meu espaço</h1><p>Só ${esc(nameOf(me))} vê o que está aqui. Use para organizar o que sente antes de levar para a conversa.${CLOUD||S.partners[me==='p0'?0:1].pin?'':' <b>Dica:</b> defina um PIN em Configurações para proteger este espaço.'}</p></section>
   <div class="card"><textarea class="in" id="pv" placeholder="Como estou me sentindo, o que me machucou, o que eu preciso…"></textarea>
   <button class="btn btn-primary btn-block" style="margin-top:12px" onclick="savePrivate()">Guardar</button></div>
   <div class="card">${list.length?list.map(e=>`<div class="list-item"><div class="row between"><span class="tiny muted">${fmtDate(e.at)}</span><button class="tiny muted" onclick="delPrivate('${e.id}')">excluir</button></div><div class="small" style="margin-top:4px;white-space:pre-wrap">${esc(e.text)}</div></div>`).join(''):'<div class="empty">Nenhuma anotação.</div>'}</div>`;
@@ -848,6 +1096,20 @@ function delPrivate(id){ if(!confirm('Excluir esta anotação?')) return; S.priv
 /* ---------- Configurações, backup e sincronização ---------- */
 function viewConfig(){
   const i=me==='p0'?0:1;
+  if(CLOUD) return `<button class="back" onclick="go('mais')">‹ Mais</button><section class="hero"><h1>Configurações</h1></section>
+  <div class="card"><h3>Nomes</h3>
+    <label class="f">Parceiro 1</label><input class="in" id="cfg0" value="${esc(S.partners[0].name)}">
+    <label class="f">Parceiro 2</label><input class="in" id="cfg1" value="${esc(S.partners[1].name)}">
+    <button class="btn btn-ghost btn-block" style="margin-top:12px" onclick="saveNames()">Salvar nomes</button></div>
+  ${inviteCard()}
+  <div class="card"><h3>Conta</h3><p class="small muted" style="margin-top:4px">Conectado como ${esc(Cloud.user.email)}. Os dados sincronizam automaticamente entre os dois celulares.</p>
+    <button class="btn btn-ghost btn-block" style="margin-top:12px" onclick="newPasswordModal()">Trocar senha</button>
+    <button class="btn btn-block" style="margin-top:6px;color:var(--muted)" onclick="sb.auth.signOut()">Sair da conta</button></div>
+  <div class="card"><h3>Backup</h3><p class="small muted" style="margin-top:4px">Baixe uma cópia dos dados do casal, ou importe um arquivo exportado da versão sem nuvem (só os seus check-ins são enviados).</p>
+    <div class="stack" style="margin-top:12px">
+      <button class="btn btn-ghost btn-block" onclick="exportData()">Exportar arquivo</button>
+      <label class="btn btn-line btn-block">Importar e mesclar<input type="file" accept="application/json,.json" class="hidden" onchange="importData(this)"></label>
+    </div></div>`;
   return `<button class="back" onclick="go('mais')">‹ Mais</button><section class="hero"><h1>Configurações</h1></section>
   <div class="card"><h3>Nomes</h3>
     <label class="f">Parceiro 1</label><input class="in" id="cfg0" value="${esc(S.partners[0].name)}">
@@ -876,7 +1138,7 @@ function exportData(){
   shared.partners=S.partners.map(p=>({name:p.name,pin:null}));
   // não exportar respostas de segurança (são privadas)
   shared.rounds=JSON.parse(JSON.stringify(S.rounds));
-  Object.values(shared.rounds).forEach(r=>Object.values(r.entries).forEach(e=>delete e.safety));
+  Object.values(shared.rounds).forEach(r=>{ Object.entries(r.entries).forEach(([p,e])=>{ if(e.hidden) delete r.entries[p]; else delete e.safety; }); });
   const blob=new Blob([JSON.stringify({elo:APP_VERSION,exportedAt:new Date().toISOString(),data:shared},null,2)],{type:'application/json'});
   const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=`elo-sync-${todayISO()}.json`; document.body.appendChild(a); a.click(); a.remove();
   toast('Arquivo exportado');
@@ -888,7 +1150,7 @@ function importData(input){
     const d=JSON.parse(rd.result).data; if(!d||!d.rounds) throw 0;
     Object.values(d.rounds).forEach(r=>{
       const cur=S.rounds[r.week]||(S.rounds[r.week]={id:r.week,week:r.week,entries:{}});
-      ['p0','p1'].forEach(p=>{ const inc=r.entries[p]; if(!inc) return; const ex=cur.entries[p];
+      ['p0','p1'].forEach(p=>{ const inc=r.entries[p]; if(!inc||inc.hidden) return; const ex=cur.entries[p];
         if(!ex || (inc.at||'')>(ex.at||'')) cur.entries[p]={...inc, safety: ex?ex.safety:undefined}; });
     });
     const mergeArr=(k)=>{ const map=new Map(S[k].map(x=>[x.id,x])); (d[k]||[]).forEach(x=>{ const ex=map.get(x.id); if(!ex) map.set(x.id,x); else if(k==='actions'&&x.status==='done'&&ex.status!=='done') map.set(x.id,x); else if(k==='conflicts'&&x.repairedAt&&!ex.repairedAt) map.set(x.id,x); }); S[k]=[...map.values()]; };
@@ -903,6 +1165,7 @@ function resetAll(){ if(!confirm('Apagar todos os dados do ELO deste aparelho?')
 /* ---------- Início ---------- */
 window.matchMedia('(prefers-color-scheme: dark)').addEventListener?.('change',()=>render());
 render();
+if(CLOUD) Cloud.init();
 </script>
 </body>
 </html>
